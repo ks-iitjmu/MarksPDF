@@ -18,7 +18,7 @@ data class PdfPageSize(val width: Int, val height: Int) {
 }
 
 /**
- * Thin, thread-safe wrapper around the platform [PdfRenderer].
+ * Thin, thread-safe wrapper around the platform PdfRenderer.
  *
  * PdfRenderer allows exactly one open page at a time and is not thread-safe, so every
  * render goes through a mutex. Rendering itself happens on the IO dispatcher, never on
@@ -37,7 +37,7 @@ class PdfDocumentSource private constructor(
     val pageCount: Int get() = pageSizes.size
 
     /**
-     * Renders [index] into a bitmap [targetWidthPx] wide, height derived from the page
+     * Renders index into a bitmap targetWidthPx wide, height derived from the page
      * aspect ratio. Returns null if the document has been closed underneath us.
      */
     suspend fun render(
