@@ -24,13 +24,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.lovepdf.core.pdf.PdfPageSize
 
-/**
- * One page in the scroller.
- *
- * Renders in two passes: a cheap low-resolution pass appears almost instantly during a
- * fast fling, then the full-resolution pass replaces it. The previous bitmap stays on
- * screen the whole time, so a page never flashes blank when the zoom level changes.
- */
 @Composable
 fun PdfPageItem(
     index: Int,
@@ -72,11 +65,7 @@ fun PdfPageItem(
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.FillBounds,
-                    // Crisper text when the bitmap is being scaled up mid-pinch.
                     filterQuality = androidx.compose.ui.graphics.FilterQuality.Medium,
-                    // Inverting at draw time costs nothing — it's a GPU colour filter on
-                    // a bitmap we already have. Re-rendering the page inverted would mean
-                    // throwing away every cached bitmap each time the toggle is flipped.
                     colorFilter = if (nightMode) PdfNightFilter else null,
                 )
             }
@@ -86,11 +75,6 @@ fun PdfPageItem(
 
 private const val PREVIEW_DIVISOR = 5
 
-/**
- * Straight inversion: white paper becomes black, black text becomes white. Photos and
- * charts invert too, which is what every night-mode reader does — the alternative needs
- * content detection per page and isn't worth the cost.
- */
 internal val PdfNightFilter = ColorFilter.colorMatrix(
     ColorMatrix(
         floatArrayOf(
@@ -102,5 +86,4 @@ internal val PdfNightFilter = ColorFilter.colorMatrix(
     )
 )
 
-/** Matches inverted white paper, so the page edge doesn't glow before it renders. */
 private val NightPageColor = Color(0xFF000000)

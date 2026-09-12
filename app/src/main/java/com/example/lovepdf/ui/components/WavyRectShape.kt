@@ -14,20 +14,6 @@ import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-/**
- * Rounded rectangle with a scalloped edge, matching the ripple in the loading ring.
- *
- * The wave rides along a *rounded* rectangle rather than a sharp one. Offsetting a sharp
- * rectangle leaves a 90-degree break at each corner that no amount of sampling smooths
- * out, because the discontinuity is in the normal direction, not in the sampling.
- * Sweeping the corners as quarter-arcs makes the normal turn gradually, so the ripple
- * carries round the corner instead of stopping at it.
- *
- * The wave is a function of arc length around the whole perimeter, and the wave count is
- * rounded to a whole number. Both are needed for the curve to meet itself at the start —
- * a fractional count closes the shape on a step, which at this size looks like a
- * rendering fault rather than a design.
- */
 class WavyRectShape(
     private val amplitude: Dp = 1.6.dp,
     private val waveLength: Dp = 12.dp,
@@ -41,18 +27,11 @@ class WavyRectShape(
     ): Outline {
         val amp = with(density) { amplitude.toPx() }
         val wave = with(density) { waveLength.toPx() }
+        val right = (size.width - amp).coerceAtLeast(amp + 1f)
+        val bottom = (size.height - amp).coerceAtLeast(amp + 1f)
+        val width = right - amp
+        val height = bottom - amp
 
-        // Inset by the amplitude so crests land on the layout bounds rather than being
-        // clipped by them.
-        val left = amp
-        val top = amp
-        val right = (size.width - amp).coerceAtLeast(left + 1f)
-        val bottom = (size.height - amp).coerceAtLeast(top + 1f)
-
-        val width = right - left
-        val height = bottom - top
-
-        // A radius larger than half the short side would make the arcs overlap.
         val radius = with(density) { cornerRadius.toPx() }
             .coerceAtMost(minOf(width, height) / 2f)
             .coerceAtLeast(0f)
@@ -71,8 +50,8 @@ class WavyRectShape(
 
             val (point, normal) = traverse(
                 distance = distance,
-                left = left,
-                top = top,
+                left = amp,
+                top = amp,
                 right = right,
                 bottom = bottom,
                 radius = radius,
@@ -90,10 +69,6 @@ class WavyRectShape(
         return Outline.Generic(path)
     }
 
-    /**
-     * Walks the rounded rectangle clockwise from the start of the top edge, returning
-     * the point at [distance] along the perimeter together with its outward normal.
-     */
     private fun traverse(
         distance: Float,
         left: Float,
@@ -107,13 +82,11 @@ class WavyRectShape(
     ): Pair<Offset, Offset> {
         var d = distance
 
-        // Top edge, left to right.
         if (d < straightX) {
             return Offset(left + radius + d, top) to Offset(0f, -1f)
         }
         d -= straightX
 
-        // Top-right corner, sweeping from pointing up to pointing right.
         if (d < arc) {
             return onArc(
                 centre = Offset(right - radius, top + radius),
@@ -167,7 +140,6 @@ class WavyRectShape(
         )
     }
 
-    /** On a circle the outward normal is the same direction as the radius. */
     private fun onArc(
         centre: Offset,
         radius: Float,
@@ -193,5 +165,4 @@ class WavyRectShape(
     }
 }
 
-/** Enough samples that the edge reads as curved at thumbnail size. */
 private const val SampleCount = 360

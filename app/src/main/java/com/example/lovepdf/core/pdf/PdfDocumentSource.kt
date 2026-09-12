@@ -11,19 +11,12 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
+import androidx.core.graphics.createBitmap
 
-/** Intrinsic size of a page in PDF points (1/72 inch). */
 data class PdfPageSize(val width: Int, val height: Int) {
     val aspectRatio: Float get() = width.toFloat() / height.toFloat()
 }
 
-/**
- * Thin, thread-safe wrapper around the platform PdfRenderer.
- *
- * PdfRenderer allows exactly one open page at a time and is not thread-safe, so every
- * render goes through a mutex. Rendering itself happens on the IO dispatcher, never on
- * the main thread — this is the single biggest factor in keeping scrolling jank-free.
- */
 class PdfDocumentSource private constructor(
     private val descriptor: ParcelFileDescriptor,
     private val renderer: PdfRenderer,
@@ -36,10 +29,6 @@ class PdfDocumentSource private constructor(
 
     val pageCount: Int get() = pageSizes.size
 
-    /**
-     * Renders index into a bitmap targetWidthPx wide, height derived from the page
-     * aspect ratio. Returns null if the document has been closed underneath us.
-     */
     suspend fun render(
         index: Int,
         targetWidthPx: Int,
@@ -52,9 +41,7 @@ class PdfDocumentSource private constructor(
             val width = targetWidthPx.coerceAtLeast(1)
             val height = (width / size.aspectRatio).toInt().coerceAtLeast(1)
 
-            val bitmap = Bitmap.createBitmap(width, height, config)
-            // PdfRenderer composites onto whatever is already in the bitmap and does not
-            // clear it, so an un-erased bitmap renders black behind the page content.
+            val bitmap = createBitmap(width, height, config)
             bitmap.eraseColor(android.graphics.Color.WHITE)
 
             renderer.openPage(index).use { page ->
@@ -75,8 +62,6 @@ class PdfDocumentSource private constructor(
     companion object {
         suspend fun open(context: Context, uri: Uri): PdfDocumentSource =
             withContext(Dispatchers.IO) {
-                // Most SAF providers hand back a seekable fd, which PdfRenderer needs.
-                // Some (cloud, streaming) don't — fall back to a cache copy.
                 runCatching { openDirect(context, uri) }
                     .getOrElse { openViaCache(context, uri) }
             }
@@ -109,8 +94,6 @@ class PdfDocumentSource private constructor(
             renderer: PdfRenderer,
             scratch: File?
         ): PdfDocumentSource {
-            // Page sizes are read once up front so the LazyColumn knows every item's
-            // height immediately — that's what stops the scrollbar jumping around.
             val sizes = List(renderer.pageCount) { i ->
                 renderer.openPage(i).use { PdfPageSize(it.width, it.height) }
             }

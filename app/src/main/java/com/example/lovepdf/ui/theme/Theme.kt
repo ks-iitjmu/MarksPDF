@@ -15,10 +15,6 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
-/**
- * Fallback palette for when dynamic color isn't available (API < 31) or is turned off.
- * Seeded around a deep rose, which reads as "Love PDF" without being candy-pink.
- */
 private val LightColors = lightColorScheme(
     primary = Color(0xFF9A4055),
     onPrimary = Color(0xFFFFFFFF),
@@ -62,13 +58,6 @@ private val DarkColors = darkColorScheme(
     onSurfaceVariant = Color(0xFFD6C2C4),
     outline = Color(0xFF9F8C8F),
 )
-
-/**
- * Stand-in for the Expressive shape scale, which is locked behind internal APIs in
- * material3 1.4.0. Expressive's corner scale is wider and rounder than baseline M3 —
- * the jump from "small" to "extraLarge" is far more dramatic, and that contrast is a
- * large part of why the look reads as Expressive.
- */
 private val ExpressiveShapes = Shapes(
     extraSmall = RoundedCornerShape(4.dp),
     small = RoundedCornerShape(8.dp),
@@ -77,19 +66,20 @@ private val ExpressiveShapes = Shapes(
     extraLarge = RoundedCornerShape(36.dp),
 )
 
-/**
- * Surface colour for floating pills — the toolbar and the thumbnail rail.
- *
- * White in light mode. In dark mode a white capsule would be a glaring slab over a dark
- * page, so it takes the darkest surface tone instead. Both pills read this, so they
- * can't drift apart.
- */
 @Composable
 fun pillSurfaceColor(): Color =
     if (MaterialTheme.colorScheme.surface.luminance() < 0.5f) {
         MaterialTheme.colorScheme.surfaceContainerHighest
     } else {
         Color.White
+    }
+
+@Composable
+fun pillButtonColor(): Color =
+    if (MaterialTheme.colorScheme.surface.luminance() < 0.5f) {
+        MaterialTheme.colorScheme.surfaceContainerHigh
+    } else {
+        MaterialTheme.colorScheme.surfaceContainer
     }
 
 @Composable

@@ -19,14 +19,9 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
@@ -39,10 +34,7 @@ import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -58,19 +50,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.lovepdf.core.pdf.PdfPageSize
 import com.example.lovepdf.ui.components.FabMenuAction
+import com.example.lovepdf.ui.components.AppLogo
+import com.example.lovepdf.ui.components.PillHeader
+import com.example.lovepdf.ui.components.PillIconButton
 import com.example.lovepdf.ui.components.FabMenuScrim
 import com.example.lovepdf.ui.components.WaveRingLoader
 import com.example.lovepdf.ui.components.ToolsFabMenu
-import com.example.lovepdf.ui.theme.pillSurfaceColor
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -82,31 +74,19 @@ fun PdfViewerScreen(
     onOpenFile: () -> Unit,
     onClose: () -> Unit,
     onSplitDocument: () -> Unit,
-    searchState: SearchState,
-    onSearchQueryChange: (String) -> Unit,
-    onSearchStep: (Int) -> Int?,
     loadBitmap: suspend (Int, Int) -> android.graphics.Bitmap?,
     loadThumbnail: suspend (Int, Int) -> android.graphics.Bitmap?,
     modifier: Modifier = Modifier,
 ) {
-    // Tapping the page hides everything but the document. For a reader this matters more
-    // than any amount of polish on the controls themselves — most of the time the best
-    // interface is none.
     var chromeVisible by remember { mutableStateOf(true) }
     var toolsExpanded by remember { mutableStateOf(false) }
-    var searchExpanded by remember { mutableStateOf(false) }
     var thumbnailsVisible by rememberSaveable { mutableStateOf(false) }
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
     var jumpRequest by remember { mutableStateOf(0 to 0) }
 
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-    // ToolbarHeight is the pill itself; ContentGap is the space below it. Without the
-    // gap the first page starts flush against the pill and the two read as one slab.
     val topInset = statusBarHeight + ToolbarHeight + ToolbarMargin * 2 + ContentGap
     val continuousBottomInset = FabSize + ToolbarMargin * 4 + ContentGap
-    // The FAB is allowed to float over a page rather than having space reserved for it:
-    // reserving a FAB-sized strip on every page shrinks the page on every screen to
-    // avoid an overlap that only matters in one corner.
     val pagedBottomInset = RailHeight + ContentGap
     val bottomInset = if (thumbnailsVisible) pagedBottomInset else continuousBottomInset
 
@@ -131,9 +111,6 @@ fun PdfViewerScreen(
                     jumpRequest = jumpRequest,
                     onCurrentIndexChange = { currentIndex = it },
                     onToggleChrome = {
-                        // A tap with the menu open means "put it away", not "go
-                        // immersive" — otherwise the menu and the chrome both vanish and
-                        // it reads as the tap having gone wrong.
                         if (toolsExpanded) toolsExpanded = false else chromeVisible = !chromeVisible
                     },
                     topContentPadding = topInset,
@@ -148,13 +125,25 @@ fun PdfViewerScreen(
             exit = slideOutVertically { -it } + fadeOut(),
             modifier = Modifier.align(Alignment.TopCenter),
         ) {
-            TitlePill(
-                title = (state as? ViewerState.Ready)?.fileName ?: "Love PDF",
+            PillHeader(
+                title = (state as? ViewerState.Ready)?.fileName ?: "LovePDF",
                 subtitle = (state as? ViewerState.Ready)?.let {
                     "${currentIndex + 1} of ${it.pageCount}"
                 },
-                onBack = onClose,
-                onOpenFile = onOpenFile,
+                leading = {
+                    PillIconButton(
+                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        label = "Back to home",
+                        onClick = onClose,
+                    )
+                },
+                trailing = {
+                    PillIconButton(
+                        icon = Icons.Outlined.FolderOpen,
+                        label = "Open a PDF",
+                        onClick = onOpenFile,
+                    )
+                },
             )
         }
 
@@ -178,33 +167,6 @@ fun PdfViewerScreen(
                     },
                 )
             }
-        }
-
-        AnimatedVisibility(
-            visible = chromeVisible && isReady,
-            enter = scaleIn() + fadeIn(),
-            exit = scaleOut() + fadeOut(),
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .navigationBarsPadding()
-                .padding(
-                    start = 20.dp,
-                    bottom = ToolbarMargin * 2 + if (thumbnailsVisible) RailHeight else 0.dp,
-                ),
-        ) {
-            SearchFab(
-                expanded = searchExpanded,
-                state = searchState,
-                onExpandedChange = { searchExpanded = it },
-                onQueryChange = { query ->
-                    onSearchQueryChange(query)
-                },
-                onStep = { delta ->
-                    onSearchStep(delta)?.let { page ->
-                        jumpRequest = jumpRequest.first + 1 to page
-                    }
-                },
-            )
         }
 
         AnimatedVisibility(
@@ -254,73 +216,6 @@ fun PdfViewerScreen(
     }
 }
 
-/**
- * Back on the left, identity in the middle, open on the right.
- *
- * The two side buttons are the same size, so the centred title actually sits on the
- * screen's centre line rather than being pushed off by a wider side. The page counter
- * is a subtitle here rather than its own floating pill — it's the same fact the title
- * describes, so two separate elements were competing to tell you where you are.
- */
-@Composable
-private fun TitlePill(
-    title: String,
-    subtitle: String?,
-    onBack: () -> Unit,
-    onOpenFile: () -> Unit,
-) {
-    Surface(
-        modifier = Modifier
-            .statusBarsPadding()
-            .padding(horizontal = 12.dp, vertical = ToolbarMargin)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(percent = 50),
-        color = pillSurfaceColor(),
-        shadowElevation = 8.dp,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Back to home",
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = title,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                if (subtitle != null) {
-                    Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-
-            IconButton(onClick = onOpenFile) {
-                Icon(
-                    imageVector = Icons.Outlined.FolderOpen,
-                    contentDescription = "Open a PDF",
-                    tint = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-        }
-    }
-}
-
 @Composable
 private fun PageScroller(
     pageSizes: List<PdfPageSize>,
@@ -352,7 +247,6 @@ private fun PageScroller(
             loadBitmap = loadBitmap,
             nightMode = nightMode,
             startIndex = currentIndex,
-            jumpRequest = jumpRequest,
             topContentPadding = topContentPadding,
             bottomContentPadding = bottomContentPadding,
             onPageChanged = onCurrentIndexChange,
@@ -360,20 +254,6 @@ private fun PageScroller(
         )
     }
 }
-
-/**
- * Page-by-page horizontal reader, used while the thumbnail rail is open.
- *
- * The zoom transform is applied to the pager, not to each page inside it. Transforming
- * the page alone meant the magnified page stayed trapped in its own slot and got clipped
- * at the slot's edges — you could zoom in but never pan out to the parts you'd zoomed
- * towards. Transforming the pager lets a zoomed page spread across the whole viewport,
- * which is how the continuous reader has always behaved.
- *
- * Pairing paging with the rail is deliberate: the rail is for navigating to a specific
- * page, and once you're navigating rather than reading, swiping one page at a time
- * matches what you're doing.
- */
 @Composable
 private fun PagedReader(
     pageSizes: List<PdfPageSize>,
@@ -397,10 +277,6 @@ private fun PagedReader(
     var viewportWidthPx by remember { mutableIntStateOf(0) }
     var viewportHeightPx by remember { mutableIntStateOf(0) }
 
-    // A hair of clearance from the screen edges while the page sits at its natural size,
-    // and none once magnified — at that point every pixel of width is wanted and the
-    // margin is just a border you're trying to see past. Keyed off settledScale rather
-    // than the live scale so the relayout happens after the pinch, not during it.
     val edgePadding = if (zoom.settledScale > 1.001f) 0.dp else PageEdgePadding
 
     LaunchedEffect(pagerState) {
@@ -410,10 +286,6 @@ private fun PagedReader(
     LaunchedEffect(jumpRequest) {
         if (jumpRequest.first > 0) pagerState.scrollToPage(jumpRequest.second)
     }
-
-    // Swiping and panning are both horizontal drags, so they'd fight each other. Locking
-    // the pager while zoomed means a drag pans the magnified page, which is what you
-    // want at that moment; zoom back out and swiping returns.
     LaunchedEffect(pagerState.currentPage) { zoom.reset() }
 
     Box(
@@ -458,9 +330,6 @@ private fun PagedReader(
                 with(density) { (edgePadding * 2).toPx() }
             val slotHeightPx = viewportHeightPx.toFloat() -
                 with(density) { (topContentPadding + bottomContentPadding).toPx() }
-
-            // Fit the whole page in its slot: constrained by height for tall pages, by
-            // width for wide ones.
             val fittedWidthPx = minOf(
                 slotWidthPx,
                 slotHeightPx.coerceAtLeast(1f) * size.aspectRatio,
@@ -468,10 +337,6 @@ private fun PagedReader(
             val renderWidthPx = (fittedWidthPx * zoom.settledScale)
                 .roundToInt()
                 .coerceAtLeast(1)
-
-            // Which dimension runs out first decides which one the page is pinned to.
-            // Always deriving width from height (or the reverse) overflows the slot the
-            // other way whenever a page is proportioned differently from the screen.
             val heightBound = slotWidthPx / slotHeightPx.coerceAtLeast(1f) > size.aspectRatio
 
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -492,14 +357,12 @@ private fun PagedReader(
     }
 }
 
-/** Continuous vertical scrolling — the default reading mode. */
 @Composable
 private fun ContinuousReader(
     pageSizes: List<PdfPageSize>,
     loadBitmap: suspend (Int, Int) -> android.graphics.Bitmap?,
     nightMode: Boolean,
     startIndex: Int,
-    jumpRequest: Pair<Int, Int>,
     topContentPadding: androidx.compose.ui.unit.Dp,
     bottomContentPadding: androidx.compose.ui.unit.Dp,
     onPageChanged: (Int) -> Unit,
@@ -514,12 +377,6 @@ private fun ContinuousReader(
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }.collect { onPageChanged(it) }
-    }
-
-    // Jumps land instantly rather than animating. Animating to a search hit 300 pages
-    // away would scroll through every page in between, rendering each one on the way.
-    LaunchedEffect(jumpRequest) {
-        if (jumpRequest.first > 0) listState.scrollToItem(jumpRequest.second)
     }
 
     val renderWidthPx by remember(viewportWidthPx) {
@@ -591,13 +448,14 @@ private fun EmptyState(onOpenFile: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        AppLogo(size = 64.dp, modifier = Modifier.padding(bottom = 20.dp))
         Text(
             text = "Nothing open yet",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
-            text = "Pick a PDF to start reading.",
+            text = "Open a PDF to start reading.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
@@ -615,7 +473,7 @@ private fun BusyState() {
     ) {
         WaveRingLoader()
         Text(
-            text = "Opening",
+            text = "Opening document",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 28.dp),
@@ -644,12 +502,9 @@ private fun ErrorState(message: String, onOpenFile: () -> Unit) {
 
 private val PageGutter = 12.dp
 
-/** Clearance from the screen edges in paged mode before any zoom is applied. */
 private val PageEdgePadding = 6.dp
-/** Matches the title pill's real height: a 48dp icon button plus its 6dp padding. */
 private val ToolbarHeight = 60.dp
 
-/** Clear space between the chrome and the document on both edges. */
 private val ContentGap = 16.dp
 private val ToolbarMargin = 8.dp
 private val FabSize = 56.dp

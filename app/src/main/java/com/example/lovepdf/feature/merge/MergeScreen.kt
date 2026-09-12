@@ -1,9 +1,5 @@
 package com.example.lovepdf.feature.merge
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,13 +7,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.MergeType
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
@@ -44,16 +38,13 @@ import androidx.compose.ui.unit.dp
 import com.example.lovepdf.core.pdf.PdfOutputStore
 import com.example.lovepdf.feature.tools.MergeItem
 import com.example.lovepdf.feature.tools.MergeState
+import com.example.lovepdf.ui.components.ToolHeaderAction
+import com.example.lovepdf.ui.components.ToolPrimaryButton
+import com.example.lovepdf.ui.components.ToolScaffold
+import com.example.lovepdf.ui.components.ToolStatusSurface
 import com.example.lovepdf.ui.components.WaveRingLoader
+import com.example.lovepdf.ui.text.countOf
 
-/**
- * Build a merge: add files, put them in the right order, run it.
- *
- * Order is shown as an explicit number on each row rather than left implicit in the
- * list position. Merge order is the one thing that silently produces a wrong result —
- * the output looks fine, just with chapters in the wrong sequence — so it's worth
- * spelling out.
- */
 @Composable
 fun MergeScreen(
     items: List<MergeItem>,
@@ -69,84 +60,47 @@ fun MergeScreen(
 ) {
     var namingFile by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize().statusBarsPadding()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 4.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
+    ToolScaffold(
+        title = "Merge PDFs",
+        icon = Icons.AutoMirrored.Outlined.MergeType,
+        onBack = onBack,
+        modifier = modifier,
+        action = { if (items.isNotEmpty()) ToolHeaderAction(Icons.Outlined.Add, "Add files", onAddFiles) },
+        bottomBar = {
+            if (items.isNotEmpty()) {
+                ToolPrimaryButton(
+                    text = if (items.size >= 2) "Merge ${countOf(items.size, "file")}" else "Add one more file",
+                    onClick = { namingFile = true },
+                    enabled = items.size >= 2,
+                )
+            }
+        },
+        overlay = if (mergeState !is MergeState.Editing) {
+            { MergeStatus(state = mergeState, onDismiss = onDismissResult) }
+        } else {
+            null
+        },
+    ) {
+        if (items.isEmpty()) {
+            EmptyPicker(onAddFiles, Modifier.weight(1f))
+        } else {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                IconButton(onClick = onBack) {
-                    // Explicit tint: nothing above this sets LocalContentColor, so the
-                    // default is black and vanishes in dark mode.
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onSurface,
+                items(items.size, key = { items[it].uri.toString() }) { index ->
+                    FileRow(
+                        position = index + 1,
+                        item = items[index],
+                        isFirst = index == 0,
+                        isLast = index == items.lastIndex,
+                        onMoveUp = { onMove(index, -1) },
+                        onMoveDown = { onMove(index, 1) },
+                        onRemove = { onRemove(index) },
                     )
                 }
-                Text(
-                    text = "Merge PDFs",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f),
-                )
-                if (items.isNotEmpty()) {
-                    TextButton(onClick = onAddFiles) { Text("Add") }
-                }
             }
-
-            if (items.isEmpty()) {
-                EmptyPicker(onAddFiles, Modifier.weight(1f))
-            } else {
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(items.size, key = { items[it].uri.toString() }) { index ->
-                        FileRow(
-                            position = index + 1,
-                            item = items[index],
-                            isFirst = index == 0,
-                            isLast = index == items.lastIndex,
-                            onMoveUp = { onMove(index, -1) },
-                            onMoveDown = { onMove(index, 1) },
-                            onRemove = { onRemove(index) },
-                        )
-                    }
-                }
-
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .navigationBarsPadding()
-                        .padding(24.dp)
-                ) {
-                    Button(
-                        onClick = { namingFile = true },
-                        enabled = items.size >= 2,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(
-                            if (items.size >= 2) {
-                                "Merge ${items.size} files"
-                            } else {
-                                "Add one more file"
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
-        AnimatedVisibility(
-            visible = mergeState !is MergeState.Editing,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
-            MergeStatus(state = mergeState, onDismiss = onDismissResult)
         }
     }
 
@@ -162,13 +116,6 @@ fun MergeScreen(
     }
 }
 
-/**
- * Asks for a filename before the merge starts.
- *
- * Naming up front rather than through a system save dialog, because the app writes into
- * its own folder — the location isn't the user's decision, only the name is. Asking for
- * one thing in a small dialog beats handing over a full file browser to collect it.
- */
 @Composable
 private fun NameFileDialog(
     initialName: String,
@@ -189,7 +136,7 @@ private fun NameFileDialog(
                     label = { Text("File name") },
                 )
                 Text(
-                    text = "Saves to Downloads / ${PdfOutputStore.FOLDER_NAME}",
+                    text = "Saved to Downloads/${PdfOutputStore.FOLDER_NAME}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 12.dp),
@@ -231,7 +178,7 @@ private fun EmptyPicker(onAddFiles: () -> Unit, modifier: Modifier = Modifier) {
             }
         }
         Text(
-            text = "Add the PDFs you want to combine",
+            text = "Add the PDFs you want to combine.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 24.dp),
@@ -298,42 +245,28 @@ private fun FileRow(
 }
 
 @Composable
-private fun MergeStatus(
-    state: MergeState,
-    onDismiss: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
-        contentAlignment = Alignment.Center,
-    ) {
+private fun MergeStatus(state: MergeState, onDismiss: () -> Unit) {
+    ToolStatusSurface {
         when (state) {
-            is MergeState.Working -> Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
+            is MergeState.Working -> {
                 WaveRingLoader()
                 Text(
-                    text = "Merging",
+                    text = "Merging files",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 20.dp),
                 )
             }
 
-            is MergeState.Failed -> Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(32.dp),
-            ) {
+            is MergeState.Failed -> {
                 Text(
                     text = state.message,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
-                TextButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.padding(top = 20.dp),
-                ) { Text("Back") }
+                TextButton(onClick = onDismiss, modifier = Modifier.padding(top = 20.dp)) {
+                    Text("Back")
+                }
             }
 
             else -> Unit

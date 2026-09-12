@@ -1,28 +1,22 @@
 package com.example.lovepdf.feature.split
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ContentCut
+import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -41,18 +35,15 @@ import com.example.lovepdf.core.pdf.PdfOutputStore
 import com.example.lovepdf.feature.tools.SplitMode
 import com.example.lovepdf.feature.tools.SplitState
 import com.example.lovepdf.ui.components.ExpressiveSlider
+import com.example.lovepdf.ui.text.countOf
+import com.example.lovepdf.ui.components.ToolHeaderAction
+import com.example.lovepdf.ui.components.ToolPrimaryButton
+import com.example.lovepdf.ui.components.ToolScaffold
+import com.example.lovepdf.ui.components.ToolStatusSurface
 import com.example.lovepdf.ui.components.WaveRingLoader
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-/**
- * Split a PDF, with all three ways of doing it on one screen.
- *
- * The modes stay visible as a single list rather than being hidden behind a chooser,
- * because "split" means three different things to different people and the fastest way
- * to find the right one is to see them side by side. Each mode shows a live sentence of
- * what it will produce, so the outcome is known before anything is written.
- */
 @Composable
 fun SplitScreen(
     state: SplitState,
@@ -74,125 +65,98 @@ fun SplitScreen(
 ) {
     var namingFile by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize().statusBarsPadding()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 4.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
+    ToolScaffold(
+        title = "Split PDF",
+        icon = Icons.Outlined.ContentCut,
+        onBack = onBack,
+        modifier = modifier,
+        action = { if (state is SplitState.Ready) ToolHeaderAction(Icons.Outlined.FolderOpen, "Change file", onPickFile) },
+        bottomBar = {
+            if (state is SplitState.Ready) {
+                ToolPrimaryButton(
+                    text = when (mode) {
+                        SplitMode.Range ->
+                            "Extract ${countOf(toPage - fromPage + 1, "page")}"
+                        SplitMode.EveryPage ->
+                            "Split into ${countOf(state.pageCount, "file")}"
+                        SplitMode.Parts ->
+                            "Split into ${countOf(parts, "file")}"
+                    },
+                    onClick = { namingFile = true },
+                )
+            }
+        },
+        overlay = when (state) {
+            is SplitState.Working, is SplitState.Done, is SplitState.Failed ->
+                { { SplitStatus(state, onOpenResult, onDismissResult) } }
+            else -> null
+        },
+    ) {
+        when (state) {
+            is SplitState.NoFile -> EmptyPicker(onPickFile, Modifier.weight(1f))
+
+            is SplitState.Loading -> Box(
+                Modifier.weight(1f).fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) { WaveRingLoader() }
+
+            is SplitState.Ready -> Column(
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp),
             ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onSurface,
+                Text(
+                    text = state.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = countOf(state.pageCount, "page"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 2.dp, bottom = 16.dp),
+                )
+
+                ModeCard(
+                    title = "Extract a page range",
+                    summary = "Creates one file containing pages $fromPage to $toPage.",
+                    selected = mode == SplitMode.Range,
+                    onClick = { onModeChange(SplitMode.Range) },
+                ) {
+                    PageRangeControls(
+                        pageCount = state.pageCount,
+                        fromPage = fromPage,
+                        toPage = toPage,
+                        onFromPageChange = onFromPageChange,
+                        onToPageChange = onToPageChange,
                     )
                 }
-                Text(
-                    text = "Split PDF",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f),
+
+                ModeCard(
+                    title = "Every page separately",
+                    summary = "Creates ${countOf(state.pageCount, "file")}, one per page.",
+                    selected = mode == SplitMode.EveryPage,
+                    onClick = { onModeChange(SplitMode.EveryPage) },
                 )
-                if (state is SplitState.Ready) {
-                    TextButton(onClick = onPickFile) { Text("Change") }
+
+                ModeCard(
+                    title = "Into equal parts",
+                    summary = partsSummary(state.pageCount, parts),
+                    selected = mode == SplitMode.Parts,
+                    onClick = { onModeChange(SplitMode.Parts) },
+                ) {
+                    ExpressiveSlider(
+                        value = parts.toFloat(),
+                        onValueChange = { onPartsChange(it.roundToInt()) },
+                        valueRange = 2f..state.pageCount.coerceAtLeast(2).toFloat(),
+                    )
                 }
             }
 
-            when (state) {
-                is SplitState.NoFile -> EmptyPicker(onPickFile, Modifier.weight(1f))
-
-                is SplitState.Loading -> Box(
-                    Modifier.weight(1f).fillMaxWidth(),
-                    contentAlignment = Alignment.Center,
-                ) { WaveRingLoader() }
-
-                is SplitState.Ready -> {
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                            .padding(horizontal = 16.dp),
-                    ) {
-                        Text(
-                            text = state.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(
-                            text = "${state.pageCount} pages",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 2.dp, bottom = 16.dp),
-                        )
-
-                        ModeCard(
-                            title = "Extract a range",
-                            summary = "Makes one file with pages $fromPage to $toPage",
-                            selected = mode == SplitMode.Range,
-                            onClick = { onModeChange(SplitMode.Range) },
-                        ) {
-                            PageRangeControls(
-                                pageCount = state.pageCount,
-                                fromPage = fromPage,
-                                toPage = toPage,
-                                onFromPageChange = onFromPageChange,
-                                onToPageChange = onToPageChange,
-                            )
-                        }
-
-                        ModeCard(
-                            title = "Every page separately",
-                            summary = "Makes ${state.pageCount} files, one per page",
-                            selected = mode == SplitMode.EveryPage,
-                            onClick = { onModeChange(SplitMode.EveryPage) },
-                        )
-
-                        ModeCard(
-                            title = "Into equal parts",
-                            summary = partsSummary(state.pageCount, parts),
-                            selected = mode == SplitMode.Parts,
-                            onClick = { onModeChange(SplitMode.Parts) },
-                        ) {
-                            ExpressiveSlider(
-                                value = parts.toFloat(),
-                                // Snapping to whole parts happens here: the slider
-                                // reports a continuous value and the ViewModel clamps it
-                                // to a valid count.
-                                onValueChange = { onPartsChange(it.roundToInt()) },
-                                valueRange = 2f..state.pageCount.coerceAtLeast(2).toFloat(),
-                            )
-                        }
-                    }
-
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .navigationBarsPadding()
-                            .padding(24.dp)
-                    ) {
-                        Button(
-                            onClick = { namingFile = true },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { Text("Split") }
-                    }
-                }
-
-                else -> Unit
-            }
-        }
-
-        AnimatedVisibility(
-            visible = state is SplitState.Working ||
-                state is SplitState.Done ||
-                state is SplitState.Failed,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
-            SplitStatus(state, onOpenResult, onDismissResult)
+            else -> Unit
         }
     }
 
@@ -245,8 +209,6 @@ private fun ModeCard(
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 2.dp),
             )
-            // Controls only appear for the chosen mode, so the screen stays readable
-            // instead of showing three sets of inputs at once.
             if (selected && controls != null) {
                 Box(Modifier.padding(top = 12.dp)) { controls() }
             }
@@ -278,9 +240,6 @@ private fun PageField(
     onChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Text is held locally so the field can be empty mid-edit. Feeding every keystroke
-    // straight into a clamped Int makes backspacing impossible — clearing "12" would
-    // snap it back to 1 before the second digit could be typed.
     var text by remember(value) { mutableStateOf(value.toString()) }
 
     OutlinedTextField(
@@ -319,7 +278,7 @@ private fun EmptyPicker(onPickFile: () -> Unit, modifier: Modifier = Modifier) {
             }
         }
         Text(
-            text = "Choose the PDF you want to split",
+            text = "Choose the PDF you want to split.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 24.dp),
@@ -347,8 +306,8 @@ private fun NameFileDialog(
                     label = { Text("File name") },
                 )
                 Text(
-                    text = "Saves to Downloads / ${PdfOutputStore.FOLDER_NAME}. " +
-                        "Multiple files get numbered automatically.",
+                    text = "Saved to Downloads/${PdfOutputStore.FOLDER_NAME}. " +
+                        "Multiple files are numbered automatically.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 12.dp),
@@ -370,38 +329,26 @@ private fun SplitStatus(
     onOpenResult: (android.net.Uri) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
-        contentAlignment = Alignment.Center,
-    ) {
+    ToolStatusSurface {
         when (state) {
-            is SplitState.Working -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            is SplitState.Working -> {
                 WaveRingLoader()
                 Text(
-                    text = "Splitting",
+                    text = "Splitting document",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 20.dp),
                 )
             }
 
-            is SplitState.Done -> Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(32.dp),
-            ) {
+            is SplitState.Done -> {
                 Text(
-                    text = if (state.results.size == 1) {
-                        "Saved 1 file"
-                    } else {
-                        "Saved ${state.results.size} files"
-                    },
+                    text = "Saved ${countOf(state.results.size, "file")}",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = "In Downloads / ${PdfOutputStore.FOLDER_NAME}",
+                    text = "In Downloads/${PdfOutputStore.FOLDER_NAME}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 6.dp),
@@ -412,8 +359,6 @@ private fun SplitStatus(
                 ) {
                     TextButton(onClick = onDismiss) { Text("Done") }
                     state.results.firstOrNull()?.let { first ->
-                        // Opening every result isn't possible, so the first one stands
-                        // in as a spot check that the split came out right.
                         Button(onClick = { onOpenResult(first) }) {
                             Text(if (state.results.size == 1) "Open it" else "Open first")
                         }
@@ -421,10 +366,7 @@ private fun SplitStatus(
                 }
             }
 
-            is SplitState.Failed -> Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(32.dp),
-            ) {
+            is SplitState.Failed -> {
                 Text(
                     text = state.message,
                     style = MaterialTheme.typography.bodyLarge,

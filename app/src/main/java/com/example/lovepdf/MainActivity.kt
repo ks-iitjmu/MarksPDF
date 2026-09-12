@@ -12,6 +12,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -32,32 +33,36 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.delay
 import com.example.lovepdf.core.pdf.PdfOutputStore
 import com.example.lovepdf.feature.home.HomeScreen
+import com.example.lovepdf.feature.images.ImagesToPdfScreen
+import com.example.lovepdf.feature.images.PdfToImagesScreen
 import com.example.lovepdf.feature.home.HomeViewModel
 import com.example.lovepdf.feature.merge.MergeScreen
+import com.example.lovepdf.feature.splash.OpeningScreen
 import com.example.lovepdf.feature.split.SplitScreen
 import com.example.lovepdf.feature.tools.MergeState
+import com.example.lovepdf.feature.tools.ImagesToPdfState
+import com.example.lovepdf.feature.tools.ImagesToPdfViewModel
 import com.example.lovepdf.feature.tools.PdfSplitViewModel
+import com.example.lovepdf.feature.tools.PdfToImagesViewModel
 import com.example.lovepdf.feature.tools.PdfToolsViewModel
-import com.example.lovepdf.feature.viewer.PdfSearchViewModel
 import com.example.lovepdf.feature.viewer.PdfViewerScreen
 import com.example.lovepdf.feature.viewer.PdfViewerViewModel
 import com.example.lovepdf.feature.viewer.ViewerState
+import com.example.lovepdf.ui.theme.Motion
 import com.example.lovepdf.ui.theme.LovePDFTheme
+import androidx.core.net.toUri
+import kotlin.time.Duration.Companion.milliseconds
 
-/**
- * Screens the app can show.
- *
- * Plain state rather than a navigation library. Three destinations with no deep links,
- * no nested graphs and no arguments beyond what the ViewModels already hold — a nav
- * dependency would add a manifest of concepts to describe something a sealed interface
- * describes completely.
- */
+
 private sealed interface Screen {
     data object Home : Screen
     data object Merge : Screen
     data object Split : Screen
+    data object Images : Screen
+    data object Export : Screen
     data object Viewer : Screen
 }
 
@@ -69,14 +74,19 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        pendingUri = intent?.takeIf { it.action == Intent.ACTION_VIEW }?.data
+        pendingUri = incomingUri(intent)
 
         setContent {
-            // Null means "follow the system"; the in-app toggle overrides from then on.
             var darkOverride by rememberSaveable { mutableStateOf<Boolean?>(null) }
             val darkMode = darkOverride ?: isSystemInDarkTheme()
 
             LovePDFTheme(darkTheme = darkMode) {
+                var opening by remember { mutableStateOf(true) }
+                LaunchedEffect(Unit) {
+                    delay(OPENING_MILLIS.milliseconds)
+                    opening = false
+                }
+
                 var screen by rememberSaveable(
                     stateSaver = ScreenSaver
                 ) { mutableStateOf<Screen>(Screen.Home) }
@@ -84,7 +94,8 @@ class MainActivity : ComponentActivity() {
                 val viewer: PdfViewerViewModel = viewModel()
                 val tools: PdfToolsViewModel = viewModel()
                 val splitter: PdfSplitViewModel = viewModel()
-                val search: PdfSearchViewModel = viewModel()
+                val images: ImagesToPdfViewModel = viewModel()
+                val exporter: PdfToImagesViewModel = viewModel()
                 val home: HomeViewModel = viewModel()
 
                 val viewerState by viewer.state.collectAsState()
@@ -96,21 +107,15 @@ class MainActivity : ComponentActivity() {
                 val splitFrom by splitter.fromPage.collectAsState()
                 val splitTo by splitter.toPage.collectAsState()
                 val splitParts by splitter.parts.collectAsState()
+                val imageItems by images.items.collectAsState()
+                val imageFit by images.fit.collectAsState()
+                val imagesState by images.state.collectAsState()
+                val exportState by exporter.state.collectAsState()
+                val exportFormat by exporter.format.collectAsState()
+                val exportQuality by exporter.quality.collectAsState()
 
-                // Tracked so the viewer can hand its document to the splitter without
-                // reopening it through a picker.
                 var openDocumentUri by rememberSaveable { mutableStateOf<String?>(null) }
-                val searchState by search.state.collectAsState()
 
-                // Dropping the index when the document changes matters more than it
-                // looks: searching a new file against the previous file's text would
-                // return hits on pages that don't contain the word.
-                LaunchedEffect(openDocumentUri) {
-                    search.onDocumentChanged(openDocumentUri?.let { Uri.parse(it) })
-                }
-
-                // Held until the viewer resolves the document's display name, which is
-                // the only point a useful recents entry can be written.
                 var pendingRecord by rememberSaveable { mutableStateOf<String?>(null) }
 
                 fun openDocument(uri: Uri) {
@@ -141,8 +146,14 @@ class MainActivity : ComponentActivity() {
                     ActivityResultContracts.OpenDocument()
                 ) { uri -> if (uri != null) splitter.load(uri) }
 
-                // API 26–28 still needs a runtime grant to write to public Downloads.
-                // On newer devices MediaStore handles it and this never fires.
+                val imagePicker = rememberLauncherForActivityResult(
+                    ActivityResultContracts.OpenMultipleDocuments()
+                ) { uris -> images.addSources(uris) }
+
+                val exportFilePicker = rememberLauncherForActivityResult(
+                    ActivityResultContracts.OpenDocument()
+                ) { uri -> if (uri != null) exporter.load(uri) }
+
                 var pendingWrite by remember {
                     mutableStateOf<Pair<PendingWrite, String>?>(null)
                 }
@@ -155,6 +166,8 @@ class MainActivity : ComponentActivity() {
                         when (request.first) {
                             PendingWrite.Merge -> tools.merge(request.second)
                             PendingWrite.Split -> splitter.run(request.second)
+                            PendingWrite.Images -> images.create(request.second)
+                            PendingWrite.Export -> exporter.export()
                         }
                     }
                 }
@@ -175,6 +188,24 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                fun startImages(fileName: String) {
+                    if (needsStorageGrant()) {
+                        pendingWrite = PendingWrite.Images to fileName
+                        storagePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    } else {
+                        images.create(fileName)
+                    }
+                }
+
+                fun startExport() {
+                    if (needsStorageGrant()) {
+                        pendingWrite = PendingWrite.Export to ""
+                        storagePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    } else {
+                        exporter.export()
+                    }
+                }
+
                 fun startSplit(vm: PdfSplitViewModel, fileName: String) {
                     if (needsStorageGrant()) {
                         pendingWrite = PendingWrite.Split to fileName
@@ -183,21 +214,21 @@ class MainActivity : ComponentActivity() {
                         vm.run(fileName)
                     }
                 }
-
-                // Recents need a display name, which only exists once the document is
-                // open. Recording here keeps that knowledge in one place.
                 LaunchedEffect(viewerState, pendingRecord) {
                     val ready = viewerState as? ViewerState.Ready
                     val uri = pendingRecord
                     if (ready != null && uri != null) {
-                        home.record(Uri.parse(uri), ready.fileName)
+                        home.record(uri.toUri(), ready.fileName, ready.pageCount)
                         pendingRecord = null
                     }
                 }
+                LaunchedEffect(imagesState) {
+                    val done = imagesState as? ImagesToPdfState.Done ?: return@LaunchedEffect
+                    val result = done.result
+                    images.reset()
+                    openDocument(result)
+                }
 
-                // A finished merge goes straight to the reader. Stopping to confirm
-                // would only ask the user to acknowledge something they already asked
-                // for.
                 LaunchedEffect(mergeState) {
                     val done = mergeState as? MergeState.Done ?: return@LaunchedEffect
                     val result = done.result
@@ -216,6 +247,8 @@ class MainActivity : ComponentActivity() {
                     when (screen) {
                         Screen.Merge -> tools.reset()
                         Screen.Split -> splitter.reset()
+                        Screen.Images -> images.reset()
+                        Screen.Export -> exporter.reset()
                         Screen.Viewer -> viewer.closeDocument()
                         else -> Unit
                     }
@@ -230,14 +263,16 @@ class MainActivity : ComponentActivity() {
                     AnimatedContent(
                         targetState = screen,
                         transitionSpec = {
-                            // Forward pushes in from the right, back slides out to it —
-                            // the direction tells you where you are in the stack.
                             if (targetState == Screen.Home) {
-                                (fadeIn() + slideInHorizontally { -it / 5 }) togetherWith
-                                    (fadeOut() + slideOutHorizontally { it })
+                                (fadeIn(Motion.enter()) +
+                                    slideInHorizontally(Motion.slideSpec) { -it / 6 }) togetherWith
+                                    (fadeOut(Motion.exit()) +
+                                        slideOutHorizontally(Motion.slideSpec) { it / 3 })
                             } else {
-                                (fadeIn() + slideInHorizontally { it }) togetherWith
-                                    (fadeOut() + slideOutHorizontally { -it / 5 })
+                                (fadeIn(Motion.enter()) +
+                                    slideInHorizontally(Motion.slideSpec) { it / 3 }) togetherWith
+                                    (fadeOut(Motion.exit()) +
+                                        slideOutHorizontally(Motion.slideSpec) { -it / 6 })
                             }
                         },
                         label = "screen",
@@ -252,7 +287,9 @@ class MainActivity : ComponentActivity() {
                                 onForgetRecent = { home.forget(it.uri) },
                                 onMerge = { screen = Screen.Merge },
                                 onSplit = { screen = Screen.Split },
-                                onShareApp = { shareApp() },
+                                onImagesToPdf = { screen = Screen.Images },
+                                onPdfToImages = { screen = Screen.Export },
+                                onExitApp = { finish() },
                             )
 
                             Screen.Merge -> MergeScreen(
@@ -300,6 +337,41 @@ class MainActivity : ComponentActivity() {
                                 },
                             )
 
+                            Screen.Images -> ImagesToPdfScreen(
+                                items = imageItems,
+                                fit = imageFit,
+                                state = imagesState,
+                                suggestedName = images.suggestedName(),
+                                onBack = {
+                                    images.reset()
+                                    screen = Screen.Home
+                                },
+                                onAddImages = { imagePicker.launch(arrayOf(MIME_IMAGE)) },
+                                onRemove = images::remove,
+                                onMove = images::move,
+                                onFitChange = images::setFit,
+                                onCreate = { name -> startImages(name) },
+                                onDismissResult = images::dismissResult,
+                            )
+
+                            Screen.Export -> PdfToImagesScreen(
+                                state = exportState,
+                                format = exportFormat,
+                                quality = exportQuality,
+                                onBack = {
+                                    exporter.reset()
+                                    screen = Screen.Home
+                                },
+                                onPickFile = { exportFilePicker.launch(arrayOf(MIME_PDF)) },
+                                onFormatChange = exporter::setFormat,
+                                onQualityChange = exporter::setQuality,
+                                onExport = { startExport() },
+                                onDismissResult = {
+                                    exporter.reset()
+                                    screen = Screen.Home
+                                },
+                            )
+
                             Screen.Viewer -> PdfViewerScreen(
                                 state = viewerState,
                                 darkMode = darkMode,
@@ -311,51 +383,50 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onSplitDocument = {
                                     openDocumentUri?.let {
-                                        splitter.load(Uri.parse(it))
+                                        splitter.load(it.toUri())
                                         screen = Screen.Split
                                     }
                                 },
-                                searchState = searchState,
-                                onSearchQueryChange = { query ->
-                                    search.setQuery(openDocumentUri?.let { Uri.parse(it) }, query)
-                                },
-                                onSearchStep = search::step,
                                 loadBitmap = viewer::pageBitmap,
                                 loadThumbnail = viewer::thumbnailBitmap,
                                 modifier = Modifier.fillMaxSize(),
                             )
                         }
                     }
+                    AnimatedVisibility(
+                        visible = opening,
+                        enter = fadeIn(),
+                        exit = fadeOut(Motion.exit()),
+                    ) {
+                        OpeningScreen()
+                    }
                 }
             }
         }
     }
 
-    /** Plain text share — no deep link to promise, so the store listing is the target. */
-    private fun shareApp() {
-        val message = buildString {
-            append("Love PDF — a fast, clean PDF reader and toolkit for Android.\n")
-            append("https://play.google.com/store/apps/details?id=$packageName")
-        }
-        val send = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, message)
-        }
-        startActivity(Intent.createChooser(send, "Share Love PDF"))
-    }
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (intent.action == Intent.ACTION_VIEW) pendingUri = intent.data
+        incomingUri(intent)?.let { pendingUri = it }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun incomingUri(intent: Intent?): Uri? = when (intent?.action) {
+        Intent.ACTION_VIEW -> intent.data
+        Intent.ACTION_SEND -> intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri
+
+        else -> null
     }
 
     companion object {
         private const val MIME_PDF = "application/pdf"
+
+        private const val OPENING_MILLIS = 1400L
+        private const val MIME_IMAGE = "image/*"
     }
 }
 
-/** Which tool is waiting on the legacy storage grant. */
-private enum class PendingWrite { Merge, Split }
+private enum class PendingWrite { Merge, Split, Images, Export }
 
 private val ScreenSaver = androidx.compose.runtime.saveable.Saver<Screen, String>(
     save = {
@@ -363,6 +434,8 @@ private val ScreenSaver = androidx.compose.runtime.saveable.Saver<Screen, String
             Screen.Home -> "home"
             Screen.Merge -> "merge"
             Screen.Split -> "split"
+            Screen.Images -> "images"
+            Screen.Export -> "export"
             Screen.Viewer -> "viewer"
         }
     },
@@ -370,6 +443,8 @@ private val ScreenSaver = androidx.compose.runtime.saveable.Saver<Screen, String
         when (it) {
             "merge" -> Screen.Merge
             "split" -> Screen.Split
+            "images" -> Screen.Images
+            "export" -> Screen.Export
             "viewer" -> Screen.Viewer
             else -> Screen.Home
         }

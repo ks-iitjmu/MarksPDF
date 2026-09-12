@@ -1,5 +1,6 @@
 package com.example.lovepdf.feature.viewer
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.graphics.Bitmap
 import android.net.Uri
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 sealed interface ViewerState {
     data object Empty : ViewerState
@@ -43,11 +45,7 @@ class PdfViewerViewModel(app: Application) : AndroidViewModel(app) {
     private var cache = PageBitmapCache()
     private var openJob: Job? = null
 
-    // Two concurrent renders keeps both CPU cores busy without letting a burst of
-    // fling-triggered requests queue up behind stale pages.
     private val renderLimit = Semaphore(2)
-
-    /** Separate lane so thumbnails never queue ahead of the page being read. */
     private val thumbnailLimit = Semaphore(1)
 
     fun open(uri: Uri) {
@@ -66,7 +64,7 @@ class PdfViewerViewModel(app: Application) : AndroidViewModel(app) {
                 )
                 awaitMinimumLoaderTime(startedAt)
                 _state.value = ready
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _state.value = ViewerState.Failed(
                     "This file couldn't be opened. It may be damaged or password protected."
                 )
@@ -74,7 +72,6 @@ class PdfViewerViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** User-facing close: releases the file and returns to the empty state. */
     fun closeDocument() {
         releaseDocument()
         _state.value = ViewerState.Empty
@@ -85,11 +82,6 @@ class PdfViewerViewModel(app: Application) : AndroidViewModel(app) {
         document = null
         cache.clear()
     }
-
-    /**
-     * Returns the page bitmap, rendering it if it isn't cached. Callers should invoke
-     * this from a LaunchedEffect so scrolling past a page cancels its pending render.
-     */
     suspend fun pageBitmap(index: Int, widthPx: Int): Bitmap? {
         val source = document ?: return null
         val width = widthPx.coerceIn(1, MAX_RENDER_WIDTH_PX)
@@ -97,23 +89,11 @@ class PdfViewerViewModel(app: Application) : AndroidViewModel(app) {
         cache[index, width]?.let { return it }
 
         return renderLimit.withPermit {
-            // Re-check: another coroutine may have rendered it while we waited.
             cache[index, width] ?: source.render(index, width)?.also {
                 cache.put(index, width, it)
             }
         }
     }
-
-    /**
-     * Low-resolution render for the thumbnail rail.
-     *
-     * Deliberately on its own single permit rather than sharing [renderLimit]. Opening
-     * the rail on a 300-page document queues a lot of work, and without a separate lane
-     * those thumbnails would sit ahead of the page you're actually reading.
-     *
-     * Config stays ARGB_8888 even though these are small and opaque — PdfRenderer
-     * rejects other bitmap configs.
-     */
     suspend fun thumbnailBitmap(index: Int, widthPx: Int): Bitmap? {
         val source = document ?: return null
         val width = widthPx.coerceIn(1, MAX_THUMB_WIDTH_PX)
@@ -127,18 +107,9 @@ class PdfViewerViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun onLowMemory() = cache.trim()
-
-    /**
-     * Holds the loading animation on screen for at least [MIN_LOADER_MILLIS].
-     *
-     * This is a floor, not an added delay: a document that genuinely takes three seconds
-     * to open waits zero extra time. It only stops small files from flashing the loader
-     * for 80ms, which reads as a glitch rather than as loading.
-     */
     private suspend fun awaitMinimumLoaderTime(startedAt: Long) {
         val elapsed = SystemClock.elapsedRealtime() - startedAt
-        if (elapsed < MIN_LOADER_MILLIS) delay(MIN_LOADER_MILLIS - elapsed)
+        if (elapsed < MIN_LOADER_MILLIS) delay((MIN_LOADER_MILLIS - elapsed).milliseconds)
     }
 
     private suspend fun displayName(uri: Uri): String = withContext(Dispatchers.IO) {
@@ -151,19 +122,15 @@ class PdfViewerViewModel(app: Application) : AndroidViewModel(app) {
         }.getOrNull() ?: uri.lastPathSegment?.substringAfterLast('/') ?: "Document"
     }
 
+    @SuppressLint("EmptySuperCall")
     override fun onCleared() {
         releaseDocument()
         super.onCleared()
     }
 
     companion object {
-        /** Caps a single page render so extreme zoom can't allocate a huge bitmap. */
         const val MAX_RENDER_WIDTH_PX = 2600
-
-        /** Thumbnails never need more than this, whatever the screen density. */
         const val MAX_THUMB_WIDTH_PX = 320
-
-        /** Tune this to taste — drop it to 0 to remove the wait entirely. */
-        private const val MIN_LOADER_MILLIS = 2200L
+        private const val MIN_LOADER_MILLIS = 320L
     }
 }

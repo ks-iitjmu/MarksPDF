@@ -41,17 +41,6 @@ import androidx.compose.ui.unit.dp
 import com.example.lovepdf.core.pdf.PdfPageSize
 import com.example.lovepdf.ui.components.WavyRectShape
 
-/**
- * Page filmstrip, built the way a photo gallery's scrubber works.
- *
- * The defining behaviour is that the selection sits still in the centre and the strip
- * slides underneath it, rather than a highlight travelling along a static row. That's
- * what makes it feel like a scrubber instead of a list: your eye stays in one place
- * while the pages move past.
- *
- * Centring is done with horizontal content padding of half the viewport, so
- * `scrollToItem(i)` lands item `i` dead centre with no offset arithmetic.
- */
 @Composable
 fun PdfThumbnailRail(
     pageSizes: List<PdfPageSize>,
@@ -79,9 +68,6 @@ fun PdfThumbnailRail(
             .fillMaxWidth()
             .height(RailHeight)
             .background(
-                // Pages behind the strip are often white, and pale thumbnails on white
-                // vanish. The gradient fades in from nothing so there's no hard seam
-                // where the panel starts.
                 Brush.verticalGradient(
                     0f to Color.Transparent,
                     0.45f to MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.94f),
@@ -115,7 +101,6 @@ fun PdfThumbnailRail(
 @Composable
 private fun FilmstripFrame(
     index: Int,
-    size: PdfPageSize,
     selected: Boolean,
     loadThumbnail: suspend (Int, Int) -> android.graphics.Bitmap?,
     nightMode: Boolean,
@@ -129,17 +114,11 @@ private fun FilmstripFrame(
     LaunchedEffect(index) {
         bitmap = loadThumbnail(index, widthPx)?.asImageBitmap()
     }
-
-    // Every frame is the same height and only the width changes, exactly like a
-    // filmstrip: the strip's top and bottom edges stay perfectly straight as you scrub.
     val width by animateDpAsState(
         targetValue = if (selected) SelectedWidth else UnselectedWidth,
         animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy),
         label = "frameWidth",
     )
-
-    // Only the current page gets the scalloped edge. Every frame rippling would turn
-    // the strip into texture, and a wave costs edge pixels the thumbnail needs.
     val shape = if (selected) SelectedFrameShape else FrameShape
 
     Box(
@@ -149,8 +128,6 @@ private fun FilmstripFrame(
             .background(MaterialTheme.colorScheme.surfaceContainerHighest)
             .then(
                 if (selected) {
-                    // A ring drawn outside the clip would be cut off, so the border sits
-                    // on the frame itself and the thumbnail is inset to match.
                     Modifier.border(2.dp, MaterialTheme.colorScheme.primary, shape)
                 } else {
                     Modifier
@@ -165,18 +142,12 @@ private fun FilmstripFrame(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(if (selected) 3.dp else 0.dp),
-                // Crop, not fit. Letterboxed thumbnails would leave uneven gaps and
-                // break the continuous strip edge.
                 contentScale = ContentScale.Crop,
-                // Same inversion the pages use. Bright white thumbnails under a dark
-                // theme would be the only glaring thing on screen.
                 colorFilter = if (nightMode) PdfNightFilter else null,
             )
         }
     }
 }
-
-/** Height the pager must leave clear at the bottom. */
 val RailHeight = 108.dp
 
 private val FrameHeight = 62.dp
@@ -185,11 +156,6 @@ private val UnselectedWidth = 34.dp
 private val ThumbGap = 4.dp
 private val FrameShape = RoundedCornerShape(4.dp)
 
-/**
- * Static, not animated. Re-deriving the outline every frame would mean rebuilding a
- * 300-point path per frame, and an edge rippling under your thumb while you scrub is a
- * distraction in a control whose whole job is to be scrubbed.
- */
 private val SelectedFrameShape = WavyRectShape(
     amplitude = 1.5.dp,
     waveLength = 13.dp,

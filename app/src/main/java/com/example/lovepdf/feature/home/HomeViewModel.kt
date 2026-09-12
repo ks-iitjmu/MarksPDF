@@ -14,18 +14,13 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
     private val _recents = MutableStateFlow(store.all())
     val recents: StateFlow<List<RecentDocument>> = _recents.asStateFlow()
 
-    fun record(uri: Uri, name: String) {
-        store.record(uri, name)
+    fun record(uri: Uri, name: String, pages: Int) {
+        store.record(uri, name, pages)
         _recents.value = store.all()
     }
 
     fun forget(uri: Uri) {
         store.remove(uri)
         _recents.value = store.all()
-    }
-
-    fun clearAll() {
-        store.clear()
-        _recents.value = emptyList()
     }
 }

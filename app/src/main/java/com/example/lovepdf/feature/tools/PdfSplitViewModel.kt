@@ -16,13 +16,10 @@ import kotlinx.coroutines.withContext
 import kotlin.math.ceil
 
 enum class SplitMode {
-    /** One new file containing a chosen page range. */
     Range,
 
-    /** Every page becomes its own file. */
     EveryPage,
 
-    /** The document is divided into a chosen number of roughly equal files. */
     Parts,
 }
 
@@ -43,7 +40,6 @@ class PdfSplitViewModel(app: Application) : AndroidViewModel(app) {
     private val _mode = MutableStateFlow(SplitMode.Range)
     val mode: StateFlow<SplitMode> = _mode.asStateFlow()
 
-    /** Inclusive, one-based, as shown to the user. Converted at the boundary. */
     private val _fromPage = MutableStateFlow(1)
     val fromPage: StateFlow<Int> = _fromPage.asStateFlow()
 
@@ -66,8 +62,8 @@ class PdfSplitViewModel(app: Application) : AndroidViewModel(app) {
                 _toPage.value = pages
                 _parts.value = 2.coerceAtMost(pages.coerceAtLeast(2))
                 SplitState.Ready(displayName(uri), pages)
-            } catch (e: Exception) {
-                SplitState.Failed("Couldn't read that file. It may be damaged or password protected.")
+            } catch (_: Exception) {
+                SplitState.Failed("This file couldn't be read. It may be damaged or password protected.")
             }
         }
     }
@@ -120,18 +116,14 @@ class PdfSplitViewModel(app: Application) : AndroidViewModel(app) {
                     SplitMode.EveryPage -> chunked(context, baseName, 1, written)
 
                     SplitMode.Parts -> {
-                        // Ceiling division, so the remainder lands in the last file
-                        // rather than creating an extra one beyond what was asked for.
                         val perFile = ceil(ready.pageCount.toDouble() / _parts.value).toInt()
                         chunked(context, baseName, perFile.coerceAtLeast(1), written)
                     }
                 }
                 SplitState.Done(results)
-            } catch (e: Exception) {
-                // Clear every part already written — a partial split leaves a folder of
-                // files the user has to work out the validity of one by one.
+            } catch (_: Exception) {
                 written.forEach { PdfOutputStore.discard(context, it) }
-                SplitState.Failed("The split didn't finish. The file may be damaged or password protected.")
+                SplitState.Failed("The split couldn't be completed. The file may be damaged or password protected.")
             }
         }
     }
@@ -147,7 +139,6 @@ class PdfSplitViewModel(app: Application) : AndroidViewModel(app) {
             source = source ?: return emptyList(),
             pagesPerFile = pagesPerFile,
         ) { index, count ->
-            // Zero-padded so the folder sorts correctly past nine parts.
             val width = count.toString().length
             val suffix = (index + 1).toString().padStart(width, '0')
             PdfOutputStore.create(context, "${baseName}_$suffix").also { written += it }
@@ -165,10 +156,6 @@ class PdfSplitViewModel(app: Application) : AndroidViewModel(app) {
         source = null
         _state.value = SplitState.NoFile
         _mode.value = SplitMode.Range
-    }
-
-    fun dismissResult() {
-        source?.let { load(it) } ?: reset()
     }
 
     private suspend fun displayName(uri: Uri): String = withContext(Dispatchers.IO) {

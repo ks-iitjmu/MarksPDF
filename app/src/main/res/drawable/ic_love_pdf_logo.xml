@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  LovePDF mark. Converted from the supplied SVG: same three paths, same colours.
+  Kept as a vector rather than PNGs so it stays sharp at every density and costs
+  a couple of kilobytes instead of a folder of bitmaps.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+
+    <!-- Document body -->
+    <path
+        android:fillColor="#EA4335"
+        android:pathData="M152,56h160l104,104v240a56,56 0,0 1,-56 56H152a56,56 0,0 1,-56 -56V112a56,56 0,0 1,56 -56Z" />
+
+    <!-- Folded corner -->
+    <path
+        android:fillColor="#FFAEA5"
+        android:pathData="M312,56l104,104h-72a32,32 0,0 1,-32 -32V56Z" />
+
+    <!-- Heart -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M256,356c80,-56 100,-96 100,-124 0,-32 -24,-52 -52,-52 -20,0 -38,12 -48,30 -10,-18 -28,-30 -48,-30 -28,0 -52,20 -52,52 0,28 20,68 100,124Z" />
+</vector>

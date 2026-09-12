@@ -6,31 +6,16 @@ import com.tom_roush.pdfbox.io.MemoryUsageSetting
 import com.tom_roush.pdfbox.multipdf.PDFMergerUtility
 import com.tom_roush.pdfbox.multipdf.Splitter
 import com.tom_roush.pdfbox.pdmodel.PDDocument
-import com.tom_roush.pdfbox.text.PDFTextStripper
+import com.tom_roush.pdfbox.pdmodel.PDPage
+import com.tom_roush.pdfbox.pdmodel.PDPageContentStream
+import com.tom_roush.pdfbox.pdmodel.common.PDRectangle
+import com.tom_roush.pdfbox.pdmodel.graphics.image.JPEGFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
-/**
- * Write operations on PDFs.
- *
- * Separate from [PdfDocumentSource] on purpose. The viewer runs on the platform's
- * PdfRenderer, which is hardware-accelerated and free but strictly read-only. Editing
- * needs PDFBox, which is pure Java, far heavier, and has no business being in the
- * rendering path. Keeping them apart means the reader stays fast no matter how much
- * editing machinery accumulates here.
- */
 object PdfToolkit {
 
-    /**
-     * Concatenates [sources] in order into [destination].
-     *
-     * Memory is capped at 50 MB before spilling to disk. PDFBox defaults to holding the
-     * whole merge in RAM, which is fine for a few small files and an instant
-     * OutOfMemoryError on a phone when someone merges a stack of scanned documents.
-     * The temp directory has to be set explicitly too — PDFBox otherwise falls back to
-     * `java.io.tmpdir`, which on Android points at a path that doesn't exist.
-     */
     suspend fun merge(
         context: Context,
         sources: List<Uri>,
@@ -68,14 +53,6 @@ object PdfToolkit {
         }
     }
 
-    /**
-     * Copies pages [fromPage]..[toPage] (zero-based, inclusive) into [destination].
-     *
-     * Uses `importPage` rather than `addPage`. `addPage` inserts a reference to a page
-     * still owned by the source document, so the output only stays valid while the
-     * source is open — it saves fine and then fails to open later. `importPage` copies
-     * the page and the resources it depends on.
-     */
     suspend fun extractRange(
         context: Context,
         source: Uri,
@@ -96,12 +73,6 @@ object PdfToolkit {
         }
     }
 
-    /**
-     * Splits [source] into chunks of [pagesPerFile] pages.
-     *
-     * [destinationFor] is called once per output part, so storage decisions stay out of
-     * here — this only needs somewhere to write.
-     */
     suspend fun splitIntoChunks(
         context: Context,
         source: Uri,
@@ -128,40 +99,65 @@ object PdfToolkit {
         }
     }
 
-    /**
-     * Extracts the text of every page, in order.
-     *
-     * Done in one pass over an open document rather than reopening per page: PDFBox
-     * parses the whole file on load, so opening it 770 times to read 770 pages would
-     * repeat that parse every time.
-     *
-     * Pages that fail to strip yield an empty string instead of aborting. A single
-     * malformed page is common in real PDFs and is no reason to lose search across the
-     * rest of the document.
-     */
-    suspend fun extractPageTexts(
+    suspend fun imagesToPdf(
         context: Context,
-        source: Uri,
+        sources: List<Uri>,
+        destination: Uri,
+        fit: PdfPageFit,
         onProgress: (done: Int, total: Int) -> Unit = { _, _ -> },
-    ): List<String> = withContext(Dispatchers.IO) {
-        openDocument(context, source).use { document ->
-            val stripper = PDFTextStripper()
-            val total = document.numberOfPages
+    ): Unit = withContext(Dispatchers.IO) {
+        require(sources.isNotEmpty()) { "Pick at least one image" }
 
-            (0 until total).map { index ->
-                val text = runCatching {
-                    stripper.startPage = index + 1
-                    stripper.endPage = index + 1
-                    stripper.getText(document)
-                }.getOrDefault("")
+        PDDocument().use { document ->
+            sources.forEachIndexed { index, uri ->
+                val bitmap = ImageDecoder.decode(context, uri)?.let { ImageDecoder.flatten(it) }
+                if (bitmap != null) {
+                    val image = JPEGFactory.createFromImage(document, bitmap, JPEG_QUALITY)
 
-                onProgress(index + 1, total)
-                text
+                    val box = when (fit) {
+                        PdfPageFit.MatchImage -> {
+                            val aspect = bitmap.width.toFloat() / bitmap.height
+                            PDRectangle(STANDARD_WIDTH, STANDARD_WIDTH / aspect)
+                        }
+
+                        PdfPageFit.A4 -> PDRectangle.A4
+                    }
+
+                    val page = PDPage(box)
+                    document.addPage(page)
+
+                    val margin = if (fit == PdfPageFit.A4) A4_MARGIN else 0f
+                    val scale = minOf(
+                        (box.width - margin * 2) / bitmap.width,
+                        (box.height - margin * 2) / bitmap.height,
+                    )
+                    val drawWidth = bitmap.width * scale
+                    val drawHeight = bitmap.height * scale
+
+                    PDPageContentStream(document, page).use { stream ->
+                        stream.drawImage(
+                            image,
+                            (box.width - drawWidth) / 2f,
+                            (box.height - drawHeight) / 2f,
+                            drawWidth,
+                            drawHeight,
+                        )
+                    }
+
+                    bitmap.recycle()
+                }
+
+                onProgress(index + 1, sources.size)
             }
+
+            if (document.numberOfPages == 0) {
+                throw IOException("None of the selected images could be read")
+            }
+
+            write(context, document, destination)
         }
     }
 
-    /** Page count, needed by the split UI before anything is chosen. */
     suspend fun pageCount(context: Context, source: Uri): Int = withContext(Dispatchers.IO) {
         openDocument(context, source).use { it.numberOfPages }
     }
@@ -184,4 +180,8 @@ object PdfToolkit {
     }
 
     private const val MAX_MEMORY_BYTES = 50L * 1024 * 1024
+
+    private const val STANDARD_WIDTH = 595.28f
+    private const val A4_MARGIN = 28f
+    private const val JPEG_QUALITY = 0.85f
 }

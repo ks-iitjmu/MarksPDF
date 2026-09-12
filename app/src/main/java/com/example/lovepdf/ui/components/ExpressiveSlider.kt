@@ -21,18 +21,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
-/**
- * Slider drawn in the Expressive style: a thick gapped track with a bar handle.
- *
- * Written directly rather than by re-skinning the material3 [androidx.compose.material3.Slider].
- * That component's `thumb`/`track` slots and its SliderState constructor have both moved
- * between releases, and pinning this file to one of those shapes makes a purely visual
- * control a version liability. Everything here is Canvas and pointer input, so it
- * behaves the same on any Compose version the project ends up on.
- *
- * Accessibility comes from [progressSemantics], which is what a screen reader needs to
- * announce a value within a range.
- */
 @Composable
 fun ExpressiveSlider(
     value: Float,
@@ -43,8 +31,6 @@ fun ExpressiveSlider(
     val density = LocalDensity.current
     val thumbWidthPx = with(density) { ThumbWidth.toPx() }
 
-    // Kept current so the gesture handlers, which are started once, never call a stale
-    // lambda or measure against an out-of-date range.
     val currentOnValueChange by rememberUpdatedState(onValueChange)
     val currentRange by rememberUpdatedState(valueRange)
 
@@ -58,9 +44,6 @@ fun ExpressiveSlider(
 
     fun reportValueAt(x: Float) {
         if (widthPx <= 0f) return
-        // The handle has width, so its centre can only travel between half a handle in
-        // from each end. Mapping against the raw width would make the last step or two
-        // unreachable.
         val usable = (widthPx - thumbWidthPx).coerceAtLeast(1f)
         val position = ((x - thumbWidthPx / 2f) / usable).coerceIn(0f, 1f)
         val range = currentRange
@@ -96,9 +79,6 @@ fun ExpressiveSlider(
         val usable = (size.width - thumbWidthPx).coerceAtLeast(1f)
         val thumbCentre = thumbWidthPx / 2f + fraction * usable
         val gap = TrackGap.toPx()
-
-        // The gap on both sides of the handle is what makes this read as Expressive
-        // rather than as a normal slider with a square thumb.
         val activeWidth = (thumbCentre - gap).coerceAtLeast(0f)
         if (activeWidth > 0f) {
             drawRoundRect(
@@ -117,9 +97,6 @@ fun ExpressiveSlider(
                 size = Size(size.width - inactiveStart, trackHeight),
                 cornerRadius = radius,
             )
-
-            // Stop indicator: marks the far end so the maximum stays visible when the
-            // handle is nowhere near it.
             val dotCentre = size.width - trackHeight / 2f
             if (dotCentre > inactiveStart + StopDotRadius.toPx()) {
                 drawCircle(

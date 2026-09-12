@@ -20,13 +20,6 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntSize
 
-/**
- * Holds the pinch-zoom transform for the page list.
- *
- * [scale] and [offset] drive a graphicsLayer, so a pinch is a pure GPU transform — no
- * relayout, no re-render, no dropped frames. [settledScale] only updates once the
- * gesture ends, and that's what triggers a crisp re-render at the new resolution.
- */
 @Stable
 class PdfZoomState(
     private val minScale: Float = 1f,
@@ -38,24 +31,15 @@ class PdfZoomState(
     var offset by mutableStateOf(Offset.Zero)
         private set
 
-    /** The zoom level the pages should be *rendered* at. Lags [scale] until settle. */
     var settledScale by mutableFloatStateOf(1f)
         private set
 
     val isZoomed: Boolean get() = scale > 1.001f
 
     private val animatable = Animatable(1f)
-
-    /**
-     * Applies one gesture frame. Returns the vertical pan that couldn't be absorbed
-     * because we hit the top or bottom of the zoomed viewport — the caller forwards
-     * that to the list so panning flows into scrolling without a seam.
-     */
     fun onGesture(centroid: Offset, pan: Offset, zoomChange: Float, viewport: IntSize): Float {
         val next = (scale * zoomChange).coerceIn(minScale, maxScale)
         val ratio = next / scale
-
-        // Keep the point under the user's fingers pinned while scaling.
         val raw = (offset - centroid) * ratio + centroid + pan
         scale = next
 
@@ -72,7 +56,6 @@ class PdfZoomState(
         settledScale = scale
     }
 
-    /** Double-tap: toggle between fit-width and a comfortable reading zoom. */
     suspend fun toggle(focus: Offset, viewport: IntSize) {
         val target = if (isZoomed) 1f else 2.5f
         val start = scale
@@ -98,13 +81,6 @@ class PdfZoomState(
 @Composable
 fun rememberPdfZoomState(): PdfZoomState = remember { PdfZoomState() }
 
-/**
- * Pinch to zoom, drag to pan when zoomed.
- *
- * The key detail: at scale 1 this modifier consumes nothing, so single-finger drags go
- * straight through to the LazyColumn and keep its native fling. It only claims the
- * gesture once a second finger lands, or once the content is already zoomed in.
- */
 fun Modifier.pdfZoomGestures(
     state: PdfZoomState,
     onOverscrollY: (Float) -> Unit,
@@ -135,7 +111,6 @@ fun Modifier.pdfZoomGestures(
     }
 }
 
-/** Single tap toggles the chrome; double tap zooms in on the tapped point. */
 fun Modifier.pdfTapGestures(
     onSingleTap: () -> Unit,
     onDoubleTap: (Offset, IntSize) -> Unit,

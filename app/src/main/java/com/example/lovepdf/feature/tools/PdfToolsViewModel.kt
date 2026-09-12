@@ -34,8 +34,6 @@ class PdfToolsViewModel(app: Application) : AndroidViewModel(app) {
     private val _mergeState = MutableStateFlow<MergeState>(MergeState.Editing)
     val mergeState: StateFlow<MergeState> = _mergeState.asStateFlow()
 
-    val canMerge: Boolean get() = _items.value.size >= 2
-
     fun addSources(uris: List<Uri>) {
         if (uris.isEmpty()) return
         viewModelScope.launch {
@@ -43,7 +41,7 @@ class PdfToolsViewModel(app: Application) : AndroidViewModel(app) {
             val added = uris
                 .filterNot { it in existing }
                 .map { MergeItem(it, displayName(it)) }
-            _items.value = _items.value + added
+            _items.value += added
         }
     }
 
@@ -51,7 +49,6 @@ class PdfToolsViewModel(app: Application) : AndroidViewModel(app) {
         _items.value = _items.value.filterIndexed { i, _ -> i != index }
     }
 
-    /** Moves an item one position up or down; the list order is the merge order. */
     fun move(index: Int, delta: Int) {
         val list = _items.value.toMutableList()
         val target = index + delta
@@ -61,12 +58,6 @@ class PdfToolsViewModel(app: Application) : AndroidViewModel(app) {
         _items.value = list
     }
 
-    /**
-     * Creates the output file, merges into it, then publishes it.
-     *
-     * The destination is created here rather than handed in from a save dialog: the app
-     * owns its output folder, so the only thing left for the user to decide is the name.
-     */
     fun merge(fileName: String) {
         val sources = _items.value.map { it.uri }
         if (sources.size < 2) return
@@ -83,36 +74,22 @@ class PdfToolsViewModel(app: Application) : AndroidViewModel(app) {
                 PdfToolkit.merge(context, sources, target)
                 PdfOutputStore.finalise(context, target)
                 MergeState.Done(target)
-            } catch (e: Exception) {
-                // A half-written PDF is worse than none — it looks like a real file and
-                // fails only when opened.
+            } catch (_: Exception) {
                 destination?.let { PdfOutputStore.discard(context, it) }
                 MergeState.Failed(
-                    "The merge didn't finish. One of the files may be damaged or password protected."
+                    "The merge couldn't be completed. One of the files may be damaged or password protected."
                 )
             }
         }
     }
 
-    /**
-     * Default name offered in the rename dialog.
-     *
-     * Fixed prefix rather than derived from the first file: merging an already-merged
-     * file produced names like "report merged merged". A timestamp keeps successive
-     * merges distinguishable in the folder without relying on MediaStore's "(1)" suffix.
-     */
     fun suggestedName(): String {
         val stamp = SimpleDateFormat("ddMMM_HHmm", Locale.getDefault()).format(Date())
         return "LovePDF_merge_$stamp"
     }
 
-    /** Called when leaving the merge screen, so the next visit starts clean. */
     fun reset() {
         _items.value = emptyList()
-        _mergeState.value = MergeState.Editing
-    }
-
-    fun dismissResult() {
         _mergeState.value = MergeState.Editing
     }
 

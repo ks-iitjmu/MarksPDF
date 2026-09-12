@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.example.lovepdf.ui.theme.Motion
 
 data class FabMenuAction(
     val icon: ImageVector,
@@ -44,17 +45,6 @@ data class FabMenuAction(
     val active: Boolean = false,
     val onClick: () -> Unit,
 )
-
-/**
- * A floating action button that opens into a stack of labelled actions.
- *
- * Each action carries a written label, which is the whole reason to prefer this over a
- * row of bare icon buttons: an icon alone is a guess until you've tapped it once, and a
- * PDF toolbar is full of icons that don't have settled conventions.
- *
- * Items animate in bottom-up with a stagger, so the eye is led from the button that was
- * just pressed towards the choices, rather than having a block appear all at once.
- */
 @Composable
 fun ToolsFabMenu(
     expanded: Boolean,
@@ -74,26 +64,24 @@ fun ToolsFabMenu(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         actions.forEachIndexed { index, action ->
-            // Closest item animates first on the way in and last on the way out, so the
-            // stack unfolds and folds from the button rather than from the far end.
             val position = actions.lastIndex - index
-            val enterDelay = position * 35
-            val exitDelay = index * 25
+            val enterDelay = position * 22
+            val exitDelay = index * 14
 
             AnimatedVisibility(
                 visible = expanded,
-                enter = fadeIn(tween(180, delayMillis = enterDelay)) +
+                enter = fadeIn(tween(Motion.Quick, delayMillis = enterDelay)) +
                     slideInVertically(
-                        animationSpec = tween(220, delayMillis = enterDelay),
+                        animationSpec = tween(Motion.Standard, delayMillis = enterDelay),
                         initialOffsetY = { it / 2 },
                     ) +
-                    scaleIn(tween(220, delayMillis = enterDelay), initialScale = 0.85f),
-                exit = fadeOut(tween(120, delayMillis = exitDelay)) +
+                    scaleIn(tween(Motion.Standard, delayMillis = enterDelay), initialScale = 0.85f),
+                exit = fadeOut(tween(Motion.Quick, delayMillis = exitDelay)) +
                     slideOutVertically(
-                        animationSpec = tween(160, delayMillis = exitDelay),
+                        animationSpec = tween(Motion.Quick, delayMillis = exitDelay),
                         targetOffsetY = { it / 2 },
                     ) +
-                    scaleOut(tween(160, delayMillis = exitDelay), targetScale = 0.85f),
+                    scaleOut(tween(Motion.Quick, delayMillis = exitDelay), targetScale = 0.85f),
             ) {
                 MenuItem(action = action, onDismiss = { onExpandedChange(false) })
             }
@@ -109,8 +97,6 @@ fun ToolsFabMenu(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    // One icon rotated rather than two swapped: the turn carries the
-                    // open/close state without the glyph jumping.
                     imageVector = if (expanded) Icons.Outlined.Close else Icons.Outlined.Tune,
                     contentDescription = if (expanded) "Close tools" else "Tools",
                     modifier = Modifier.graphicsLayer { rotationZ = fabRotation },
@@ -120,7 +106,6 @@ fun ToolsFabMenu(
     }
 }
 
-/** Full-screen catcher so a tap anywhere outside the menu closes it. */
 @Composable
 fun FabMenuScrim(expanded: Boolean, onDismiss: () -> Unit) {
     AnimatedVisibility(visible = expanded, enter = fadeIn(), exit = fadeOut()) {

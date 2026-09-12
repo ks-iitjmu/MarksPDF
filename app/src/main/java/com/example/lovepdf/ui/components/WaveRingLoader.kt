@@ -29,22 +29,6 @@ import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
 
-/**
- * The app's one loading animation: a wavy ring rippling inside a filled circle.
- *
- * Deliberately the only loader in the app. Different animations for merging, splitting
- * and opening made the app feel assembled from parts — a loading state carries no
- * information about which operation is running, so varying it only costs recognition.
- *
- * The outline is a circle with a sine wobble on its radius:
- * r(theta) = R * (1 + amplitude * sin(lobes * theta + phase)). Animating `phase` alone
- * sends the bumps travelling around the ring while the ring stays put, so the wave moves
- * through the shape rather than the shape spinning. A slow independent rotation runs on
- * top so the motion never looks mechanical.
- *
- * `lobes` must stay a whole number. A fractional count leaves the curve unable to meet
- * itself at theta = 2*PI, which shows as a notch in the ring.
- */
 @Composable
 fun WaveRingLoader(
     modifier: Modifier = Modifier,
@@ -52,7 +36,7 @@ fun WaveRingLoader(
     strokeWidth: Dp = 4.dp,
     color: Color = MaterialTheme.colorScheme.primary,
     containerColor: Color = MaterialTheme.colorScheme.secondaryContainer,
-    content: @Composable () -> Unit = {},
+    content: @Composable () -> Unit = { AppLogo(size = size * LogoFraction) },
 ) {
     val transition = rememberInfiniteTransition(label = "waveRing")
 
@@ -122,14 +106,12 @@ fun WaveRingLoader(
     }
 }
 
-/** Breathing room between the circle's edge and the ring's outermost crest. */
 private val RingInset = 22.dp
 
-/** Number of bumps around the ring. Whole number, or the curve won't close cleanly. */
+private const val LogoFraction = 0.38f
+
 private const val Lobes = 12f
 
-/** How far crests sit beyond the base radius. Past ~0.12 it turns into a starburst. */
 private const val Amplitude = 0.085f
 
-/** Enough segments that the curve reads as smooth rather than faceted. */
 private const val Segments = 240
