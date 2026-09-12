@@ -1,4 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">LovePDF</string>
+    <string name="app_name" translatable="false">MarksPDF</string>
+
+    <!-- Shared actions -->
+    <string name="action_back">Back</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_done">Done</string>
+    <string name="action_create">Create</string>
+    <string name="action_merge">Merge</string>
+    <string name="action_split">Split</string>
+    <string name="action_next">Next</string>
+    <string name="action_skip">Skip</string>
+    <string name="action_open_it">Open it</string>
+    <string name="action_open_first">Open first</string>
+    <string name="action_open_pdf">Open a PDF</string>
+    <string name="action_pick_another">Pick another file</string>
+
+    <!-- Home -->
+    <string name="home_question">What would you\nlike to do?</string>
+    <string name="section_recent">Recent</string>
+    <string name="recents_empty">Files you open will appear here.</string>
+    <string name="tool_view_title">View PDF</string>
+    <string name="tool_view_subtitle">Open and start reading</string>
+    <string name="tool_merge_title">Merge PDFs</string>
+    <string name="tool_merge_subtitle">Combine into one file</string>
+    <string name="tool_split_title">Split PDF</string>
+    <string name="tool_split_subtitle">Extract or divide pages</string>
+    <string name="tool_images_title">Images to PDF</string>
+    <string name="tool_images_subtitle">Combine photos or scans</string>
+    <string name="tool_export_title">PDF to images</string>
+    <string name="tool_export_subtitle">Extract pages as images</string>
+    <string name="cd_change_language">Change language</string>
+    <string name="cd_switch_light">Switch to light theme</string>
+    <string name="cd_switch_dark">Switch to dark theme</string>
+    <string name="cd_remove_recent">Remove %1$s from recents</string>
+
+    <!-- Relative times -->
+    <string name="time_just_now">Just now</string>
+    <string name="time_minutes_ago">%1$d min ago</string>
+    <string name="time_hours_ago">%1$d hr ago</string>
+
+    <!-- Reader -->
+    <string name="cd_back_home">Back to home</string>
+    <string name="cd_tools">Tools</string>
+    <string name="cd_close_tools">Close tools</string>
+    <string name="viewer_browse_pages">Browse pages</string>
+    <string name="viewer_hide_pages">Hide pages</string>
+    <string name="theme_light">Light theme</string>
+    <string name="theme_dark">Dark theme</string>
+    <string name="viewer_empty_title">Nothing open yet</string>
+    <string name="viewer_empty_body">Open a PDF to start reading.</string>
+    <string name="viewer_opening">Opening document</string>
+
+    <!-- Merge -->
+    <string name="merge_title">Merge PDFs</string>
+    <string name="cd_add_files">Add files</string>
+    <string name="cd_add_pdfs">Add PDFs</string>
+    <string name="merge_add_one_more">Add one more file</string>
+    <string name="merge_empty_prompt">Add the PDFs you want to combine.</string>
+    <string name="merge_progress">Merging files</string>
+    <string name="dialog_name_file">Name your file</string>
+    <string name="dialog_name_files">Name your files</string>
+    <string name="field_file_name">File name</string>
+    <string name="saved_to_folder">Saved to Downloads/%1$s</string>
+    <string name="saved_to_folder_numbered">Saved to Downloads/%1$s. Multiple files are numbered automatically.</string>
+    <string name="in_downloads">In Downloads/%1$s</string>
+    <string name="cd_move_earlier_named">Move %1$s earlier</string>
+    <string name="cd_move_later_named">Move %1$s later</string>
+    <string name="cd_remove_named">Remove %1$s</string>
+    <string name="cd_move_earlier">Move earlier</string>
+    <string name="cd_move_later">Move later</string>
+    <string name="cd_remove">Remove</string>
+
+    <!-- Split -->
+    <string name="split_title">Split PDF</string>
+    <string name="cd_change_file">Change file</string>
+    <string name="cd_choose_pdf">Choose a PDF</string>
+    <string name="split_empty_prompt">Choose the PDF you want to split.</string>
+    <string name="split_progress">Splitting document</string>
+    <string name="split_mode_range_title">Extract a page range</string>
+    <string name="split_mode_range_summary">Creates one file containing pages %1$d to %2$d.</string>
+    <string name="split_mode_every_title">Every page separately</string>
+    <string name="split_mode_parts_title">Into equal parts</string>
+    <string name="field_from">From</string>
+    <string name="field_to">To</string>
+
+    <!-- Images to PDF -->
+    <string name="images_title">Images to PDF</string>
+    <string name="cd_add_images">Add images</string>
+    <string name="images_empty_prompt">Add the photos or scans you want to combine.</string>
+    <string name="images_progress">Creating your PDF</string>
+    <string name="fit_match_title">Match image</string>
+    <string name="fit_match_summary">No borders</string>
+    <string name="fit_a4_title">A4 pages</string>
+    <string name="fit_a4_summary">Ready to print</string>
+
+    <!-- PDF to images -->
+    <string name="export_title">PDF to images</string>
+    <string name="export_empty_prompt">Choose the PDF you want to export.</string>
+    <string name="export_progress">Exporting pages</string>
+    <string name="label_format">Format</string>
+    <string name="label_quality">Quality</string>
+    <string name="format_jpg">JPG</string>
+    <string name="format_jpg_summary">Smaller files</string>
+    <string name="format_png">PNG</string>
+    <string name="format_png_summary">Lossless</string>
+    <string name="quality_standard">Standard</string>
+    <string name="quality_standard_summary">For screens</string>
+    <string name="quality_high">High</string>
+    <string name="quality_high_summary">For printing</string>
+    <string name="export_note">Images are saved to a folder named after the document, so the pages stay together.</string>
+
+    <!-- Errors -->
+    <string name="error_open_failed">This file couldn\'t be opened. It may be damaged or password protected.</string>
+    <string name="error_read_failed">This file couldn\'t be read. It may be damaged or password protected.</string>
+    <string name="error_merge_failed">The merge couldn\'t be completed. One of the files may be damaged or password protected.</string>
+    <string name="error_split_failed">The split couldn\'t be completed. The file may be damaged or password protected.</string>
+    <string name="error_export_failed">The export couldn\'t be completed. There may not be enough free space on the device.</string>
+    <string name="error_images_failed">The PDF couldn\'t be created. One of the images may be in an unsupported format.</string>
+    <string name="fallback_document">Document</string>
+    <string name="fallback_image">Image</string>
+
+    <!-- Introduction -->
+    <string name="intro_1_title">Merge and split</string>
+    <string name="intro_1_body">Combine several PDFs into one, or pull out just the pages you need.</string>
+    <string name="intro_2_title">Photos into a PDF</string>
+    <string name="intro_2_body">Turn scans or camera photos into a single document, in the order you choose.</string>
+    <string name="intro_3_title">Pages into images</string>
+    <string name="intro_3_body">Export every page as a JPG or PNG, saved to a folder named after the file.</string>
+    <string name="intro_4_title">Everything stays on your phone</string>
+    <string name="intro_4_body">Files are never uploaded. Every tool runs on the device, offline.</string>
+    <string name="intro_language_title">Choose your language</string>
+    <string name="intro_start">Start using MarksPDF</string>
+    <string name="language_dialog_title">Language</string>
+
+    <!-- Opening -->
+    <string name="cd_page_number">Page %1$d</string>
+    <string name="viewer_save_copy">Save a copy</string>
+    <string name="viewer_share">Share</string>
+    <string name="viewer_open_with">Open with</string>
+    <string name="share_chooser_title">Share document</string>
+    <string name="open_with_title">Open document with</string>
+    <string name="toast_copy_saved">Saved to Downloads/MarksPDF</string>
+    <string name="toast_copy_failed">Couldn\'t save a copy</string>
 </resources>

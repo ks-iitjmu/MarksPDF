@@ -11,25 +11,18 @@ plugins {
 }
 
 android {
-    namespace = "com.example.lovepdf"
+    namespace = "com.kunalsharma.markspdf"
     compileSdk {
         version = release(37)
     }
     defaultConfig {
-        applicationId = "com.example.lovepdf"
+        applicationId = "com.kunalsharma.markspdf"
         minSdk = 26
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    buildTypes {
-        release {
-            optimization {
-                enable = false
-            }
-        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -45,6 +38,14 @@ android {
                 storePassword = keystoreProperties["storePassword"] as String
                 keyAlias = keystoreProperties["keyAlias"] as String
                 keyPassword = keystoreProperties["keyPassword"] as String
+            }
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("release")
+            optimization {
+                enable = false
             }
         }
     }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="page_count">
+        <item quantity="one">%1$d ਸਫ਼ਾ</item>
+        <item quantity="other">%1$d ਸਫ਼ੇ</item>
+    </plurals>
+    <plurals name="merge_button">
+        <item quantity="one">%1$d ਫ਼ਾਈਲ ਜੋੜੋ</item>
+        <item quantity="other">%1$d ਫ਼ਾਈਲਾਂ ਜੋੜੋ</item>
+    </plurals>
+    <plurals name="split_extract_button">
+        <item quantity="one">%1$d ਸਫ਼ਾ ਕੱਢੋ</item>
+        <item quantity="other">%1$d ਸਫ਼ੇ ਕੱਢੋ</item>
+    </plurals>
+    <plurals name="split_into_button">
+        <item quantity="one">%1$d ਫ਼ਾਈਲ ਵਿੱਚ ਵੰਡੋ</item>
+        <item quantity="other">%1$d ਫ਼ਾਈਲਾਂ ਵਿੱਚ ਵੰਡੋ</item>
+    </plurals>
+    <plurals name="split_every_summary">
+        <item quantity="one">%1$d ਫ਼ਾਈਲ ਬਣੇਗੀ, ਹਰ ਸਫ਼ੇ ਦੀ ਇੱਕ।</item>
+        <item quantity="other">%1$d ਫ਼ਾਈਲਾਂ ਬਣਨਗੀਆਂ, ਹਰ ਸਫ਼ੇ ਦੀ ਇੱਕ।</item>
+    </plurals>
+    <plurals name="split_parts_summary">
+        <item quantity="one">%1$d ਫ਼ਾਈਲ ਬਣੇਗੀ, ਲਗਭਗ %2$d ਸਫ਼ਿਆਂ ਦੀ।</item>
+        <item quantity="other">%1$d ਫ਼ਾਈਲਾਂ ਬਣਨਗੀਆਂ, ਹਰ ਇੱਕ ਲਗਭਗ %2$d ਸਫ਼ਿਆਂ ਦੀ।</item>
+    </plurals>
+    <plurals name="split_saved">
+        <item quantity="one">%1$d ਫ਼ਾਈਲ ਸੇਵ ਹੋਈ</item>
+        <item quantity="other">%1$d ਫ਼ਾਈਲਾਂ ਸੇਵ ਹੋਈਆਂ</item>
+    </plurals>
+    <plurals name="export_button">
+        <item quantity="one">%1$d ਤਸਵੀਰ ਕੱਢੋ</item>
+        <item quantity="other">%1$d ਤਸਵੀਰਾਂ ਕੱਢੋ</item>
+    </plurals>
+    <plurals name="export_saved">
+        <item quantity="one">%1$d ਤਸਵੀਰ ਸੇਵ ਹੋਈ</item>
+        <item quantity="other">%1$d ਤਸਵੀਰਾਂ ਸੇਵ ਹੋਈਆਂ</item>
+    </plurals>
+    <plurals name="images_create_button">
+        <item quantity="one">%1$d ਸਫ਼ੇ ਦੀ PDF ਬਣਾਓ</item>
+        <item quantity="other">%1$d ਸਫ਼ਿਆਂ ਦੀ PDF ਬਣਾਓ</item>
+    </plurals>
+</resources>

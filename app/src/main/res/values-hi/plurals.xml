@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="page_count">
+        <item quantity="one">%1$d पेज</item>
+        <item quantity="other">%1$d पेज</item>
+    </plurals>
+    <plurals name="merge_button">
+        <item quantity="one">%1$d फ़ाइल जोड़ें</item>
+        <item quantity="other">%1$d फ़ाइलें जोड़ें</item>
+    </plurals>
+    <plurals name="split_extract_button">
+        <item quantity="one">%1$d पेज निकालें</item>
+        <item quantity="other">%1$d पेज निकालें</item>
+    </plurals>
+    <plurals name="split_into_button">
+        <item quantity="one">%1$d फ़ाइल में बाँटें</item>
+        <item quantity="other">%1$d फ़ाइलों में बाँटें</item>
+    </plurals>
+    <plurals name="split_every_summary">
+        <item quantity="one">%1$d फ़ाइल बनेगी, हर पेज की एक।</item>
+        <item quantity="other">%1$d फ़ाइलें बनेंगी, हर पेज की एक।</item>
+    </plurals>
+    <plurals name="split_parts_summary">
+        <item quantity="one">%1$d फ़ाइल बनेगी, लगभग %2$d पेज की।</item>
+        <item quantity="other">%1$d फ़ाइलें बनेंगी, हर एक लगभग %2$d पेज की।</item>
+    </plurals>
+    <plurals name="split_saved">
+        <item quantity="one">%1$d फ़ाइल सेव हुई</item>
+        <item quantity="other">%1$d फ़ाइलें सेव हुईं</item>
+    </plurals>
+    <plurals name="export_button">
+        <item quantity="one">%1$d इमेज निकालें</item>
+        <item quantity="other">%1$d इमेज निकालें</item>
+    </plurals>
+    <plurals name="export_saved">
+        <item quantity="one">%1$d इमेज सेव हुई</item>
+        <item quantity="other">%1$d इमेज सेव हुईं</item>
+    </plurals>
+    <plurals name="images_create_button">
+        <item quantity="one">%1$d पेज की PDF बनाएँ</item>
+        <item quantity="other">%1$d पेज की PDF बनाएँ</item>
+    </plurals>
+</resources>

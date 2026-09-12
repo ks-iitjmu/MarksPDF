@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MarksPDF mark, converted from the supplied SVG. Same shapes, same colours.
+  Kept as a vector so it stays sharp at every size and one asset serves the header,
+  the opening screen and the launcher icon.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+
+    <path
+        android:fillColor="#D3E3FD"
+        android:pathData="M216,40 H408 A48,48 0 0 1 456,88 V368 A48,48 0 0 1 408,416 H216 A48,48 0 0 1 168,368 V88 A48,48 0 0 1 216,40 Z" />
+    <path
+        android:fillColor="#1A73E8"
+        android:pathData="M112,96h160l104,104v216a56,56 0,0 1,-56 56H112a56,56 0,0 1,-56 -56V152a56,56 0,0 1,56 -56Z" />
+    <path
+        android:fillColor="#A8C7FA"
+        android:pathData="M272,96l104,104h-72a32,32 0,0 1,-32 -32V96Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M130,192 H158 A26,26 0 0 1 184,218 V246 A26,26 0 0 1 158,272 H130 A26,26 0 0 1 104,246 V218 A26,26 0 0 1 130,192 Z" />
+    <path
+        android:strokeColor="#1A73E8"
+        android:strokeWidth="16"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M124,234l14,14 28,-32" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M218,202 H302 A10,10 0 0 1 312,212 V212 A10,10 0 0 1 302,222 H218 A10,10 0 0 1 208,212 V212 A10,10 0 0 1 218,202 Z" />
+    <path
+        android:fillColor="#A8C7FA"
+        android:pathData="M218,242 H270 A10,10 0 0 1 280,252 V252 A10,10 0 0 1 270,262 H218 A10,10 0 0 1 208,252 V252 A10,10 0 0 1 218,242 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M130,304 H158 A26,26 0 0 1 184,330 V358 A26,26 0 0 1 158,384 H130 A26,26 0 0 1 104,358 V330 A26,26 0 0 1 130,304 Z" />
+    <path
+        android:strokeColor="#1A73E8"
+        android:strokeWidth="16"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M124,346l14,14 28,-32" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M218,314 H302 A10,10 0 0 1 312,324 V324 A10,10 0 0 1 302,334 H218 A10,10 0 0 1 208,324 V324 A10,10 0 0 1 218,314 Z" />
+    <path
+        android:fillColor="#A8C7FA"
+        android:pathData="M218,354 H270 A10,10 0 0 1 280,364 V364 A10,10 0 0 1 270,374 H218 A10,10 0 0 1 208,364 V364 A10,10 0 0 1 218,354 Z" />
+</vector>

@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LovePDF"
+rootProject.name = "MarksPDF"
 include(":app")

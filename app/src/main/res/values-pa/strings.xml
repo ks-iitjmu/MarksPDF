@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shared actions -->
+    <string name="action_back">ਵਾਪਸ</string>
+    <string name="action_cancel">ਰੱਦ ਕਰੋ</string>
+    <string name="action_done">ਹੋ ਗਿਆ</string>
+    <string name="action_create">ਬਣਾਓ</string>
+    <string name="action_merge">ਜੋੜੋ</string>
+    <string name="action_split">ਵੱਖ ਕਰੋ</string>
+    <string name="action_next">ਅੱਗੇ</string>
+    <string name="action_skip">ਛੱਡੋ</string>
+    <string name="action_open_it">ਖੋਲ੍ਹੋ</string>
+    <string name="action_open_first">ਪਹਿਲੀ ਫ਼ਾਈਲ ਖੋਲ੍ਹੋ</string>
+    <string name="action_open_pdf">PDF ਖੋਲ੍ਹੋ</string>
+    <string name="action_pick_another">ਹੋਰ ਫ਼ਾਈਲ ਚੁਣੋ</string>
+
+    <!-- Home -->
+    <string name="home_question">ਅੱਜ ਤੁਸੀਂ ਕੀ\nਕਰਨਾ ਚਾਹੋਗੇ?</string>
+    <string name="section_recent">ਹਾਲੀਆ ਫ਼ਾਈਲਾਂ</string>
+    <string name="recents_empty">ਤੁਹਾਡੀਆਂ ਖੋਲ੍ਹੀਆਂ ਫ਼ਾਈਲਾਂ ਇੱਥੇ ਦਿਖਣਗੀਆਂ।</string>
+    <string name="tool_view_title">PDF ਵੇਖੋ</string>
+    <string name="tool_view_subtitle">ਖੋਲ੍ਹੋ ਅਤੇ ਪੜ੍ਹਨਾ ਸ਼ੁਰੂ ਕਰੋ</string>
+    <string name="tool_merge_title">PDF ਜੋੜੋ</string>
+    <string name="tool_merge_subtitle">ਕਈ ਫ਼ਾਈਲਾਂ ਇੱਕ ਵਿੱਚ ਮਿਲਾਓ</string>
+    <string name="tool_split_title">PDF ਵੱਖ ਕਰੋ</string>
+    <string name="tool_split_subtitle">ਸਫ਼ੇ ਕੱਢੋ ਜਾਂ ਵੰਡੋ</string>
+    <string name="tool_images_title">ਤਸਵੀਰਾਂ ਤੋਂ PDF</string>
+    <string name="tool_images_subtitle">ਫ਼ੋਟੋ ਜਾਂ ਸਕੈਨ ਮਿਲਾਓ</string>
+    <string name="tool_export_title">PDF ਤੋਂ ਤਸਵੀਰਾਂ</string>
+    <string name="tool_export_subtitle">ਸਫ਼ੇ ਤਸਵੀਰਾਂ ਵਜੋਂ ਕੱਢੋ</string>
+    <string name="cd_change_language">ਭਾਸ਼ਾ ਬਦਲੋ</string>
+    <string name="cd_switch_light">ਲਾਈਟ ਥੀਮ ’ਤੇ ਜਾਓ</string>
+    <string name="cd_switch_dark">ਡਾਰਕ ਥੀਮ ’ਤੇ ਜਾਓ</string>
+    <string name="cd_remove_recent">%1$s ਨੂੰ ਹਾਲੀਆ ਸੂਚੀ ਵਿੱਚੋਂ ਹਟਾਓ</string>
+
+    <!-- Relative times -->
+    <string name="time_just_now">ਹੁਣੇ</string>
+    <string name="time_minutes_ago">%1$d ਮਿੰਟ ਪਹਿਲਾਂ</string>
+    <string name="time_hours_ago">%1$d ਘੰਟੇ ਪਹਿਲਾਂ</string>
+
+    <!-- Reader -->
+    <string name="cd_back_home">ਹੋਮ ’ਤੇ ਵਾਪਸ</string>
+    <string name="cd_tools">ਟੂਲ</string>
+    <string name="cd_close_tools">ਟੂਲ ਬੰਦ ਕਰੋ</string>
+    <string name="viewer_browse_pages">ਸਫ਼ੇ ਵੇਖੋ</string>
+    <string name="viewer_hide_pages">ਸਫ਼ੇ ਲੁਕਾਓ</string>
+    <string name="theme_light">ਲਾਈਟ ਥੀਮ</string>
+    <string name="theme_dark">ਡਾਰਕ ਥੀਮ</string>
+    <string name="viewer_empty_title">ਹਾਲੇ ਕੁਝ ਨਹੀਂ ਖੁੱਲ੍ਹਿਆ</string>
+    <string name="viewer_empty_body">ਪੜ੍ਹਨਾ ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਕੋਈ PDF ਖੋਲ੍ਹੋ।</string>
+    <string name="viewer_opening">ਦਸਤਾਵੇਜ਼ ਖੁੱਲ੍ਹ ਰਿਹਾ ਹੈ</string>
+
+    <!-- Merge -->
+    <string name="merge_title">PDF ਜੋੜੋ</string>
+    <string name="cd_add_files">ਫ਼ਾਈਲਾਂ ਜੋੜੋ</string>
+    <string name="cd_add_pdfs">PDF ਜੋੜੋ</string>
+    <string name="merge_add_one_more">ਇੱਕ ਹੋਰ ਫ਼ਾਈਲ ਜੋੜੋ</string>
+    <string name="merge_empty_prompt">ਜਿਹੜੀਆਂ PDF ਮਿਲਾਉਣੀਆਂ ਹਨ ਉਹ ਜੋੜੋ।</string>
+    <string name="merge_progress">ਫ਼ਾਈਲਾਂ ਜੋੜੀਆਂ ਜਾ ਰਹੀਆਂ ਹਨ</string>
+    <string name="dialog_name_file">ਫ਼ਾਈਲ ਦਾ ਨਾਂ ਰੱਖੋ</string>
+    <string name="dialog_name_files">ਫ਼ਾਈਲਾਂ ਦਾ ਨਾਂ ਰੱਖੋ</string>
+    <string name="field_file_name">ਫ਼ਾਈਲ ਦਾ ਨਾਂ</string>
+    <string name="saved_to_folder">Downloads/%1$s ਵਿੱਚ ਸੇਵ ਹੋਵੇਗੀ</string>
+    <string name="saved_to_folder_numbered">Downloads/%1$s ਵਿੱਚ ਸੇਵ ਹੋਣਗੀਆਂ। ਕਈ ਫ਼ਾਈਲਾਂ ’ਤੇ ਆਪਣੇ ਆਪ ਨੰਬਰ ਲੱਗ ਜਾਂਦੇ ਹਨ।</string>
+    <string name="in_downloads">Downloads/%1$s ਵਿੱਚ</string>
+    <string name="cd_move_earlier_named">%1$s ਨੂੰ ਪਹਿਲਾਂ ਲੈ ਜਾਓ</string>
+    <string name="cd_move_later_named">%1$s ਨੂੰ ਬਾਅਦ ਵਿੱਚ ਲੈ ਜਾਓ</string>
+    <string name="cd_remove_named">%1$s ਹਟਾਓ</string>
+    <string name="cd_move_earlier">ਪਹਿਲਾਂ ਲੈ ਜਾਓ</string>
+    <string name="cd_move_later">ਬਾਅਦ ਵਿੱਚ ਲੈ ਜਾਓ</string>
+    <string name="cd_remove">ਹਟਾਓ</string>
+
+    <!-- Split -->
+    <string name="split_title">PDF ਵੱਖ ਕਰੋ</string>
+    <string name="cd_change_file">ਫ਼ਾਈਲ ਬਦਲੋ</string>
+    <string name="cd_choose_pdf">PDF ਚੁਣੋ</string>
+    <string name="split_empty_prompt">ਜਿਹੜੀ PDF ਵੱਖ ਕਰਨੀ ਹੈ ਉਹ ਚੁਣੋ।</string>
+    <string name="split_progress">ਦਸਤਾਵੇਜ਼ ਵੱਖ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ</string>
+    <string name="split_mode_range_title">ਸਫ਼ਿਆਂ ਦੀ ਹੱਦ ਕੱਢੋ</string>
+    <string name="split_mode_range_summary">ਸਫ਼ਾ %1$d ਤੋਂ %2$d ਤੱਕ ਦੀ ਇੱਕ ਫ਼ਾਈਲ ਬਣੇਗੀ।</string>
+    <string name="split_mode_every_title">ਹਰ ਸਫ਼ਾ ਵੱਖਰਾ</string>
+    <string name="split_mode_parts_title">ਬਰਾਬਰ ਹਿੱਸਿਆਂ ਵਿੱਚ</string>
+    <string name="field_from">ਤੋਂ</string>
+    <string name="field_to">ਤੱਕ</string>
+
+    <!-- Images to PDF -->
+    <string name="images_title">ਤਸਵੀਰਾਂ ਤੋਂ PDF</string>
+    <string name="cd_add_images">ਤਸਵੀਰਾਂ ਜੋੜੋ</string>
+    <string name="images_empty_prompt">ਜਿਹੜੀਆਂ ਫ਼ੋਟੋ ਜਾਂ ਸਕੈਨ ਮਿਲਾਉਣੀਆਂ ਹਨ ਉਹ ਜੋੜੋ।</string>
+    <string name="images_progress">ਤੁਹਾਡੀ PDF ਬਣ ਰਹੀ ਹੈ</string>
+    <string name="fit_match_title">ਤਸਵੀਰ ਮੁਤਾਬਕ</string>
+    <string name="fit_match_summary">ਕੋਈ ਕਿਨਾਰਾ ਨਹੀਂ</string>
+    <string name="fit_a4_title">A4 ਸਫ਼ੇ</string>
+    <string name="fit_a4_summary">ਪ੍ਰਿੰਟ ਲਈ ਤਿਆਰ</string>
+
+    <!-- PDF to images -->
+    <string name="export_title">PDF ਤੋਂ ਤਸਵੀਰਾਂ</string>
+    <string name="export_empty_prompt">ਜਿਹੜੀ PDF ਬਦਲਣੀ ਹੈ ਉਹ ਚੁਣੋ।</string>
+    <string name="export_progress">ਸਫ਼ੇ ਕੱਢੇ ਜਾ ਰਹੇ ਹਨ</string>
+    <string name="label_format">ਫ਼ਾਰਮੈਟ</string>
+    <string name="label_quality">ਕੁਆਲਿਟੀ</string>
+    <string name="format_jpg">JPG</string>
+    <string name="format_jpg_summary">ਛੋਟੀਆਂ ਫ਼ਾਈਲਾਂ</string>
+    <string name="format_png">PNG</string>
+    <string name="format_png_summary">ਪੂਰੀ ਕੁਆਲਿਟੀ</string>
+    <string name="quality_standard">ਆਮ</string>
+    <string name="quality_standard_summary">ਸਕ੍ਰੀਨ ਲਈ</string>
+    <string name="quality_high">ਉੱਚੀ</string>
+    <string name="quality_high_summary">ਪ੍ਰਿੰਟ ਲਈ</string>
+    <string name="export_note">ਤਸਵੀਰਾਂ ਦਸਤਾਵੇਜ਼ ਦੇ ਨਾਂ ਵਾਲੇ ਫ਼ੋਲਡਰ ਵਿੱਚ ਸੇਵ ਹੁੰਦੀਆਂ ਹਨ, ਤਾਂ ਜੋ ਸਾਰੇ ਸਫ਼ੇ ਇਕੱਠੇ ਰਹਿਣ।</string>
+
+    <!-- Errors -->
+    <string name="error_open_failed">ਇਹ ਫ਼ਾਈਲ ਖੁੱਲ੍ਹ ਨਹੀਂ ਸਕੀ। ਹੋ ਸਕਦਾ ਹੈ ਇਹ ਖ਼ਰਾਬ ਹੋਵੇ ਜਾਂ ਇਸ ’ਤੇ ਪਾਸਵਰਡ ਲੱਗਾ ਹੋਵੇ।</string>
+    <string name="error_read_failed">ਇਹ ਫ਼ਾਈਲ ਪੜ੍ਹੀ ਨਹੀਂ ਜਾ ਸਕੀ। ਹੋ ਸਕਦਾ ਹੈ ਇਹ ਖ਼ਰਾਬ ਹੋਵੇ ਜਾਂ ਇਸ ’ਤੇ ਪਾਸਵਰਡ ਲੱਗਾ ਹੋਵੇ।</string>
+    <string name="error_merge_failed">ਫ਼ਾਈਲਾਂ ਜੋੜੀਆਂ ਨਹੀਂ ਜਾ ਸਕੀਆਂ। ਹੋ ਸਕਦਾ ਹੈ ਕੋਈ ਫ਼ਾਈਲ ਖ਼ਰਾਬ ਹੋਵੇ ਜਾਂ ਉਸ ’ਤੇ ਪਾਸਵਰਡ ਲੱਗਾ ਹੋਵੇ।</string>
+    <string name="error_split_failed">ਫ਼ਾਈਲ ਵੱਖ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ। ਹੋ ਸਕਦਾ ਹੈ ਇਹ ਖ਼ਰਾਬ ਹੋਵੇ ਜਾਂ ਇਸ ’ਤੇ ਪਾਸਵਰਡ ਲੱਗਾ ਹੋਵੇ।</string>
+    <string name="error_export_failed">ਸਫ਼ੇ ਕੱਢੇ ਨਹੀਂ ਜਾ ਸਕੇ। ਹੋ ਸਕਦਾ ਹੈ ਡਿਵਾਈਸ ਵਿੱਚ ਥਾਂ ਘੱਟ ਹੋਵੇ।</string>
+    <string name="error_images_failed">PDF ਨਹੀਂ ਬਣ ਸਕੀ। ਹੋ ਸਕਦਾ ਹੈ ਕੋਈ ਤਸਵੀਰ ਅਜਿਹੇ ਫ਼ਾਰਮੈਟ ਵਿੱਚ ਹੋਵੇ ਜੋ ਸਮਰਥਿਤ ਨਹੀਂ।</string>
+    <string name="fallback_document">ਦਸਤਾਵੇਜ਼</string>
+    <string name="fallback_image">ਤਸਵੀਰ</string>
+
+    <!-- Introduction -->
+    <string name="intro_1_title">ਜੋੜੋ ਅਤੇ ਵੱਖ ਕਰੋ</string>
+    <string name="intro_1_body">ਕਈ PDF ਇੱਕ ਵਿੱਚ ਮਿਲਾਓ, ਜਾਂ ਸਿਰਫ਼ ਲੋੜੀਂਦੇ ਸਫ਼ੇ ਕੱਢ ਲਓ।</string>
+    <string name="intro_2_title">ਫ਼ੋਟੋ ਤੋਂ PDF</string>
+    <string name="intro_2_body">ਸਕੈਨ ਜਾਂ ਕੈਮਰੇ ਦੀਆਂ ਫ਼ੋਟੋ ਨੂੰ ਆਪਣੀ ਪਸੰਦ ਦੇ ਕ੍ਰਮ ਵਿੱਚ ਇੱਕ ਦਸਤਾਵੇਜ਼ ਬਣਾਓ।</string>
+    <string name="intro_3_title">ਸਫ਼ਿਆਂ ਤੋਂ ਤਸਵੀਰਾਂ</string>
+    <string name="intro_3_body">ਹਰ ਸਫ਼ੇ ਨੂੰ JPG ਜਾਂ PNG ਵਿੱਚ ਕੱਢੋ, ਫ਼ਾਈਲ ਦੇ ਨਾਂ ਵਾਲੇ ਫ਼ੋਲਡਰ ਵਿੱਚ ਸੇਵ।</string>
+    <string name="intro_4_title">ਸਭ ਕੁਝ ਤੁਹਾਡੇ ਫ਼ੋਨ ’ਤੇ ਰਹਿੰਦਾ ਹੈ</string>
+    <string name="intro_4_body">ਫ਼ਾਈਲਾਂ ਕਦੇ ਅੱਪਲੋਡ ਨਹੀਂ ਹੁੰਦੀਆਂ। ਹਰ ਟੂਲ ਡਿਵਾਈਸ ’ਤੇ ਹੀ ਚੱਲਦਾ ਹੈ, ਬਿਨਾਂ ਇੰਟਰਨੈੱਟ।</string>
+    <string name="intro_language_title">ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ</string>
+    <string name="intro_start">MarksPDF ਸ਼ੁਰੂ ਕਰੋ</string>
+    <string name="language_dialog_title">ਭਾਸ਼ਾ</string>
+
+    <!-- Opening -->
+    <string name="cd_page_number">ਸਫ਼ਾ %1$d</string>
+    <string name="viewer_save_copy">ਕਾਪੀ ਸੰਭਾਲੋ</string>
+    <string name="viewer_share">ਸਾਂਝਾ ਕਰੋ</string>
+    <string name="viewer_open_with">ਇਸ ਨਾਲ ਖੋਲ੍ਹੋ</string>
+    <string name="share_chooser_title">ਦਸਤਾਵੇਜ਼ ਸਾਂਝਾ ਕਰੋ</string>
+    <string name="open_with_title">ਦਸਤਾਵੇਜ਼ ਇਸ ਨਾਲ ਖੋਲ੍ਹੋ</string>
+    <string name="toast_copy_saved">Downloads/MarksPDF ਵਿੱਚ ਸੰਭਾਲਿਆ ਗਿਆ</string>
+    <string name="toast_copy_failed">ਕਾਪੀ ਸੰਭਾਲੀ ਨਹੀਂ ਜਾ ਸਕੀ</string>
+</resources>

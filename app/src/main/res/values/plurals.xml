@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="page_count">
+        <item quantity="one">%1$d page</item>
+        <item quantity="other">%1$d pages</item>
+    </plurals>
+    <plurals name="merge_button">
+        <item quantity="one">Merge %1$d file</item>
+        <item quantity="other">Merge %1$d files</item>
+    </plurals>
+    <plurals name="split_extract_button">
+        <item quantity="one">Extract %1$d page</item>
+        <item quantity="other">Extract %1$d pages</item>
+    </plurals>
+    <plurals name="split_into_button">
+        <item quantity="one">Split into %1$d file</item>
+        <item quantity="other">Split into %1$d files</item>
+    </plurals>
+    <plurals name="split_every_summary">
+        <item quantity="one">Creates %1$d file, one per page.</item>
+        <item quantity="other">Creates %1$d files, one per page.</item>
+    </plurals>
+    <plurals name="split_parts_summary">
+        <item quantity="one">Makes %1$d file of about %2$d pages.</item>
+        <item quantity="other">Makes %1$d files of about %2$d pages each.</item>
+    </plurals>
+    <plurals name="split_saved">
+        <item quantity="one">Saved %1$d file</item>
+        <item quantity="other">Saved %1$d files</item>
+    </plurals>
+    <plurals name="export_button">
+        <item quantity="one">Export %1$d image</item>
+        <item quantity="other">Export %1$d images</item>
+    </plurals>
+    <plurals name="export_saved">
+        <item quantity="one">Saved %1$d image</item>
+        <item quantity="other">Saved %1$d images</item>
+    </plurals>
+    <plurals name="images_create_button">
+        <item quantity="one">Create a %1$d-page PDF</item>
+        <item quantity="other">Create a %1$d-page PDF</item>
+    </plurals>
+</resources>

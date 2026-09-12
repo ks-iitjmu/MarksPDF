@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shared actions -->
+    <string name="action_back">वापस</string>
+    <string name="action_cancel">रद्द करें</string>
+    <string name="action_done">हो गया</string>
+    <string name="action_create">बनाएँ</string>
+    <string name="action_merge">जोड़ें</string>
+    <string name="action_split">अलग करें</string>
+    <string name="action_next">आगे</string>
+    <string name="action_skip">छोड़ें</string>
+    <string name="action_open_it">खोलें</string>
+    <string name="action_open_first">पहली फ़ाइल खोलें</string>
+    <string name="action_open_pdf">PDF खोलें</string>
+    <string name="action_pick_another">दूसरी फ़ाइल चुनें</string>
+
+    <!-- Home -->
+    <string name="home_question">आज आप क्या\nकरना चाहेंगे?</string>
+    <string name="section_recent">हाल की फ़ाइलें</string>
+    <string name="recents_empty">आपकी खोली हुई फ़ाइलें यहाँ दिखेंगी।</string>
+    <string name="tool_view_title">PDF देखें</string>
+    <string name="tool_view_subtitle">खोलें और पढ़ना शुरू करें</string>
+    <string name="tool_merge_title">PDF जोड़ें</string>
+    <string name="tool_merge_subtitle">कई फ़ाइलें एक में मिलाएँ</string>
+    <string name="tool_split_title">PDF अलग करें</string>
+    <string name="tool_split_subtitle">पेज निकालें या बाँटें</string>
+    <string name="tool_images_title">इमेज से PDF</string>
+    <string name="tool_images_subtitle">फ़ोटो या स्कैन मिलाएँ</string>
+    <string name="tool_export_title">PDF से इमेज</string>
+    <string name="tool_export_subtitle">पेज इमेज के रूप में निकालें</string>
+    <string name="cd_change_language">भाषा बदलें</string>
+    <string name="cd_switch_light">लाइट थीम पर जाएँ</string>
+    <string name="cd_switch_dark">डार्क थीम पर जाएँ</string>
+    <string name="cd_remove_recent">%1$s को हाल की सूची से हटाएँ</string>
+
+    <!-- Relative times -->
+    <string name="time_just_now">अभी</string>
+    <string name="time_minutes_ago">%1$d मिनट पहले</string>
+    <string name="time_hours_ago">%1$d घंटे पहले</string>
+
+    <!-- Reader -->
+    <string name="cd_back_home">होम पर वापस</string>
+    <string name="cd_tools">टूल</string>
+    <string name="cd_close_tools">टूल बंद करें</string>
+    <string name="viewer_browse_pages">पेज देखें</string>
+    <string name="viewer_hide_pages">पेज छिपाएँ</string>
+    <string name="theme_light">लाइट थीम</string>
+    <string name="theme_dark">डार्क थीम</string>
+    <string name="viewer_empty_title">अभी कुछ खुला नहीं है</string>
+    <string name="viewer_empty_body">पढ़ना शुरू करने के लिए कोई PDF खोलें।</string>
+    <string name="viewer_opening">दस्तावेज़ खुल रहा है</string>
+
+    <!-- Merge -->
+    <string name="merge_title">PDF जोड़ें</string>
+    <string name="cd_add_files">फ़ाइलें जोड़ें</string>
+    <string name="cd_add_pdfs">PDF जोड़ें</string>
+    <string name="merge_add_one_more">एक और फ़ाइल जोड़ें</string>
+    <string name="merge_empty_prompt">जिन PDF को मिलाना है उन्हें जोड़ें।</string>
+    <string name="merge_progress">फ़ाइलें जोड़ी जा रही हैं</string>
+    <string name="dialog_name_file">फ़ाइल का नाम रखें</string>
+    <string name="dialog_name_files">फ़ाइलों का नाम रखें</string>
+    <string name="field_file_name">फ़ाइल का नाम</string>
+    <string name="saved_to_folder">Downloads/%1$s में सेव होगी</string>
+    <string name="saved_to_folder_numbered">Downloads/%1$s में सेव होंगी। कई फ़ाइलों पर अपने आप नंबर लग जाते हैं।</string>
+    <string name="in_downloads">Downloads/%1$s में</string>
+    <string name="cd_move_earlier_named">%1$s को पहले ले जाएँ</string>
+    <string name="cd_move_later_named">%1$s को बाद में ले जाएँ</string>
+    <string name="cd_remove_named">%1$s हटाएँ</string>
+    <string name="cd_move_earlier">पहले ले जाएँ</string>
+    <string name="cd_move_later">बाद में ले जाएँ</string>
+    <string name="cd_remove">हटाएँ</string>
+
+    <!-- Split -->
+    <string name="split_title">PDF अलग करें</string>
+    <string name="cd_change_file">फ़ाइल बदलें</string>
+    <string name="cd_choose_pdf">PDF चुनें</string>
+    <string name="split_empty_prompt">जिस PDF को अलग करना है उसे चुनें।</string>
+    <string name="split_progress">दस्तावेज़ अलग किया जा रहा है</string>
+    <string name="split_mode_range_title">पेजों की सीमा निकालें</string>
+    <string name="split_mode_range_summary">पेज %1$d से %2$d तक की एक फ़ाइल बनेगी।</string>
+    <string name="split_mode_every_title">हर पेज अलग</string>
+    <string name="split_mode_parts_title">बराबर हिस्सों में</string>
+    <string name="field_from">से</string>
+    <string name="field_to">तक</string>
+
+    <!-- Images to PDF -->
+    <string name="images_title">इमेज से PDF</string>
+    <string name="cd_add_images">इमेज जोड़ें</string>
+    <string name="images_empty_prompt">जिन फ़ोटो या स्कैन को मिलाना है उन्हें जोड़ें।</string>
+    <string name="images_progress">आपकी PDF बन रही है</string>
+    <string name="fit_match_title">इमेज के अनुसार</string>
+    <string name="fit_match_summary">कोई किनारा नहीं</string>
+    <string name="fit_a4_title">A4 पेज</string>
+    <string name="fit_a4_summary">प्रिंट के लिए तैयार</string>
+
+    <!-- PDF to images -->
+    <string name="export_title">PDF से इमेज</string>
+    <string name="export_empty_prompt">जिस PDF को बदलना है उसे चुनें।</string>
+    <string name="export_progress">पेज निकाले जा रहे हैं</string>
+    <string name="label_format">फ़ॉर्मैट</string>
+    <string name="label_quality">क्वालिटी</string>
+    <string name="format_jpg">JPG</string>
+    <string name="format_jpg_summary">छोटी फ़ाइलें</string>
+    <string name="format_png">PNG</string>
+    <string name="format_png_summary">पूरी क्वालिटी</string>
+    <string name="quality_standard">सामान्य</string>
+    <string name="quality_standard_summary">स्क्रीन के लिए</string>
+    <string name="quality_high">उच्च</string>
+    <string name="quality_high_summary">प्रिंट के लिए</string>
+    <string name="export_note">इमेज दस्तावेज़ के नाम वाले फ़ोल्डर में सेव होती हैं, ताकि सारे पेज एक साथ रहें।</string>
+
+    <!-- Errors -->
+    <string name="error_open_failed">यह फ़ाइल खोली नहीं जा सकी। हो सकता है यह ख़राब हो या इस पर पासवर्ड लगा हो।</string>
+    <string name="error_read_failed">यह फ़ाइल पढ़ी नहीं जा सकी। हो सकता है यह ख़राब हो या इस पर पासवर्ड लगा हो।</string>
+    <string name="error_merge_failed">फ़ाइलें जोड़ी नहीं जा सकीं। हो सकता है कोई फ़ाइल ख़राब हो या उस पर पासवर्ड लगा हो।</string>
+    <string name="error_split_failed">फ़ाइल अलग नहीं की जा सकी। हो सकता है यह ख़राब हो या इस पर पासवर्ड लगा हो।</string>
+    <string name="error_export_failed">पेज निकाले नहीं जा सके। हो सकता है डिवाइस में जगह कम हो।</string>
+    <string name="error_images_failed">PDF नहीं बन सकी। हो सकता है कोई इमेज ऐसे फ़ॉर्मैट में हो जो समर्थित नहीं है।</string>
+    <string name="fallback_document">दस्तावेज़</string>
+    <string name="fallback_image">इमेज</string>
+
+    <!-- Introduction -->
+    <string name="intro_1_title">जोड़ें और अलग करें</string>
+    <string name="intro_1_body">कई PDF को एक में मिलाएँ, या सिर्फ़ ज़रूरी पेज निकाल लें।</string>
+    <string name="intro_2_title">फ़ोटो से PDF</string>
+    <string name="intro_2_body">स्कैन या कैमरे की फ़ोटो को अपनी पसंद के क्रम में एक दस्तावेज़ बनाएँ।</string>
+    <string name="intro_3_title">पेजों से इमेज</string>
+    <string name="intro_3_body">हर पेज को JPG या PNG में निकालें, फ़ाइल के नाम वाले फ़ोल्डर में सेव।</string>
+    <string name="intro_4_title">सब कुछ आपके फ़ोन में रहता है</string>
+    <string name="intro_4_body">फ़ाइलें कभी अपलोड नहीं होतीं। हर टूल डिवाइस पर ही चलता है, बिना इंटरनेट।</string>
+    <string name="intro_language_title">अपनी भाषा चुनें</string>
+    <string name="intro_start">MarksPDF शुरू करें</string>
+    <string name="language_dialog_title">भाषा</string>
+
+    <!-- Opening -->
+    <string name="cd_page_number">पृष्ठ %1$d</string>
+    <string name="viewer_save_copy">कॉपी सहेजें</string>
+    <string name="viewer_share">साझा करें</string>
+    <string name="viewer_open_with">इससे खोलें</string>
+    <string name="share_chooser_title">दस्तावेज़ साझा करें</string>
+    <string name="open_with_title">दस्तावेज़ इससे खोलें</string>
+    <string name="toast_copy_saved">Downloads/MarksPDF में सहेजा गया</string>
+    <string name="toast_copy_failed">कॉपी सहेजी नहीं जा सकी</string>
+</resources>
