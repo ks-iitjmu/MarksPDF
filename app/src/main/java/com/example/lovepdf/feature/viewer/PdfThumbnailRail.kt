@@ -1,5 +1,6 @@
 package com.example.lovepdf.feature.viewer
 
+import android.graphics.Bitmap
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -45,7 +46,7 @@ import com.example.lovepdf.ui.components.WavyRectShape
 fun PdfThumbnailRail(
     pageSizes: List<PdfPageSize>,
     currentPage: Int,
-    loadThumbnail: suspend (index: Int, widthPx: Int) -> android.graphics.Bitmap?,
+    loadThumbnail: suspend (index: Int, widthPx: Int) -> Bitmap?,
     onPageSelected: (Int) -> Unit,
     nightMode: Boolean,
     modifier: Modifier = Modifier,
@@ -102,9 +103,10 @@ fun PdfThumbnailRail(
 private fun FilmstripFrame(
     index: Int,
     selected: Boolean,
-    loadThumbnail: suspend (Int, Int) -> android.graphics.Bitmap?,
+    loadThumbnail: suspend (Int, Int) -> Bitmap?,
     nightMode: Boolean,
     onClick: () -> Unit,
+    size: PdfPageSize,
 ) {
     val density = LocalDensity.current
     val widthPx = remember { with(density) { (SelectedWidth * 2).toPx().toInt() } }

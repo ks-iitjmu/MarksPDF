@@ -72,7 +72,6 @@ fun ImagesToPdfScreen(
 
     ToolScaffold(
         title = "Images to PDF",
-        icon = Icons.Outlined.PhotoLibrary,
         onBack = onBack,
         modifier = modifier,
         action = { if (items.isNotEmpty()) ToolHeaderAction(Icons.Outlined.Add, "Add images", onAddImages) },

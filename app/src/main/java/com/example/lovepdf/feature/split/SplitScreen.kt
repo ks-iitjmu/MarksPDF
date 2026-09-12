@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ContentCut
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.AlertDialog
@@ -67,7 +66,6 @@ fun SplitScreen(
 
     ToolScaffold(
         title = "Split PDF",
-        icon = Icons.Outlined.ContentCut,
         onBack = onBack,
         modifier = modifier,
         action = { if (state is SplitState.Ready) ToolHeaderAction(Icons.Outlined.FolderOpen, "Change file", onPickFile) },

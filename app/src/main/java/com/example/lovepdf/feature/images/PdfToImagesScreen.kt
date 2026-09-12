@@ -13,7 +13,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.FolderOpen
-import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -49,7 +48,6 @@ fun PdfToImagesScreen(
 ) {
     ToolScaffold(
         title = "PDF to images",
-        icon = Icons.Outlined.Image,
         onBack = onBack,
         modifier = modifier,
         action = { if (state is PdfToImagesState.Ready) ToolHeaderAction(Icons.Outlined.FolderOpen, "Change file", onPickFile) },

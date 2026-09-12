@@ -62,7 +62,6 @@ fun MergeScreen(
 
     ToolScaffold(
         title = "Merge PDFs",
-        icon = Icons.AutoMirrored.Outlined.MergeType,
         onBack = onBack,
         modifier = modifier,
         action = { if (items.isNotEmpty()) ToolHeaderAction(Icons.Outlined.Add, "Add files", onAddFiles) },
